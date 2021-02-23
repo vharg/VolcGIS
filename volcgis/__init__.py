@@ -85,11 +85,17 @@ class eruption:
         self.ref['transform'] = affine.Affine(self.res, 0.0, self.ref['bounds'][0], 0.0, -self.res, self.ref['bounds'][3])
         self.ref['EPSG'] = rio.crs.CRS.from_epsg(self.EPSG)
 
-    def getLandscan(self):
+    def getLandscan(self, inPth=None):
         """ Retrieves Landscan data for the area defined by self.area.
-        """
         
-        inPth = 'DATA/Landscan.tif'
+        Arguments:
+            inPth (str): Path to corresponding raster
+
+        Output:
+            
+        """
+        if inPth is None:
+            inPth = 'DATA/Landscan.tif'
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landscan.tif')
         
         originalRes = 1000 # Landscan resolution
@@ -97,13 +103,31 @@ class eruption:
         
         self.alignRaster(inPth, outPth, resampling='nearest', scalingFactor=scaling)
 
-    def getLandcover(self):
+    def getLandcover(self, inPth=None):
         """ Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
-        """
         
-        inPth = 'DATA/LC100_2018_croped.tif'
+        Arguments:
+            inPth (str): Path to corresponding raster
+
+        Output:
+            
+        """
+        if inPth is None:
+            inPth = 'DATA/LC100_2018_croped.tif'
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landcover.tif')
         self.alignRaster(inPth, outPth, resampling='nearest')
+        
+    def getBuildingExposure(self, inPth=None):
+        """ Retrieves building exposure from George's analysis for area defined by self.area.
+        
+        Arguments:
+            inPth (str): Path to corresponding raster
+
+        Output:
+            
+        """
+        if inPth is None:
+            
          
     def prepareHazard(self, hazard):
         """ Prepare the hazard layers

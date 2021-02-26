@@ -149,7 +149,7 @@ class eruption:
         """
         # if inPth is None:
             
-    def getRoadExposure(self, inPth=None):
+    def getRoadNetwork(self, inPth=None):
         """
 
         Argumentss:

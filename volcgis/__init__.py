@@ -149,6 +149,19 @@ class eruption:
         """
         # if inPth is None:
             
+    def getRoadExposure(self, inPth=None):
+        
+        # Re-project self.areaG to pseudo mercator 3857
+        bbox = self.area.to_crs(from_epsg(3857)) # Project it
+
+        # Get bbox for thi geometry
+        gpd.read_file( bbox=bbox['geometry'])
+        
+        # Read osm data with bbox from inPth
+        
+        # Reproject to self.EPSG
+        
+        # Save to outPth
          
     def prepareHazard(self, hazard):
         """ Prepare the hazard layers

@@ -214,6 +214,7 @@ for i in range(0, volcDB.shape[0]):
     # PREPARE EXPOSURE DATA
     erup.getLandcover()
     erup.getLandscan()
+    # erup.getRoadExposure()
     
     
     # Exposure analysis

@@ -158,7 +158,7 @@ class eruption:
         gpd.read_file( bbox=bbox['geometry'])
         
         # Read osm data with bbox from inPth
-        
+        # Hi there!
         # Reproject to self.EPSG
         
         # Save to outPth

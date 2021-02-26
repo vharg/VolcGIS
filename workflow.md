@@ -12,7 +12,7 @@ graph LR
         B1 --> B3(VEI);
         B1 --> B4(Wind);
 
-    Hazards --> C1(PDC_DC);
+    Hazards --> C1(PDC_DC<br> s);
         C1 --> C2(Buffer 2x)
         C1 --> C3(Volume 2x)
         
@@ -33,3 +33,41 @@ graph LR
 
 
 ```
+
+
+```mermaid
+graph LR
+
+
+
+    vol[Volcano]
+    haz[Hazards]
+    mod[Model]
+    vul[Vulnerability]
+    gis[GIS]
+
+    
+
+
+
+
+
+
+    vol --> gis
+    vol -.-> mod
+    haz --> mod --> gis
+
+    vul --> gis
+
+
+```
+
+    te[Tephra fall ]
+    li[Lapilli impact]
+    baf[PDC/BAF]
+    cc[PDC/CC]
+
+    te <--> haz
+    li <--> haz
+    baf <--> haz
+    cc <--> haz

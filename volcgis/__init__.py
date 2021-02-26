@@ -70,10 +70,29 @@ class eruption:
         self.vent = {'lat': eruption['vent'][0], 'lon': eruption['vent'][1], 'easting': round(xtmp), 'northing': round(ytmp), 'alt': eruption['vent'][2]}
 
         # Create area mask
-        areaPl = box(round(xtmp)-eruption['extent'][0], 
-                     round(ytmp)-eruption['extent'][2],
-                     round(xtmp)+eruption['extent'][1],
-                     round(ytmp)+eruption['extent'][3])
+        # if eruption['extent'][0]<0:
+        #     xmin = round(xtmp)+abs(eruption['extent'][0])
+        # else:
+        #     xmin = round(xtmp)-eruption['extent'][0]
+            
+        # if eruption['extent'][0]<0:
+        #     xmax = round(xtmp)+abs(eruption['extent'][1])
+        # else:
+        #     xmax = round(xtmp)-eruption['extent'][1]
+            
+            
+        # areaPl = box(xmin, 
+        #              round(ytmp)-eruption['extent'][2],
+        #              xmax,
+        #              round(ytmp)+eruption['extent'][3])
+        
+        areaPl = box(eruption['extent'][0], 
+                     eruption['extent'][2],
+                     eruption['extent'][1],
+                     eruption['extent'][3])
+        
+        # dxMin, dxMax, dyMin, dyMax = volcgis.makeZoneBoundaries(xtmp, ytmp, 
+
         self.area = gpd.GeoDataFrame({'geometry': areaPl}, index=[0], crs=self.EPSG_proj) # Area is now projected
         self.areaG = self.area.to_crs(from_epsg(4326)) # Project it
 
@@ -96,6 +115,7 @@ class eruption:
         """
         if inPth is None:
             inPth = 'DATA/Landscan.tif'
+
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landscan.tif')
         
         originalRes = 1000 # Landscan resolution
@@ -114,6 +134,7 @@ class eruption:
         """
         if inPth is None:
             inPth = 'DATA/LC100_2018_croped.tif'
+
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landcover.tif')
         self.alignRaster(inPth, outPth, resampling='nearest')
         
@@ -126,7 +147,7 @@ class eruption:
         Output:
             
         """
-        if inPth is None:
+        # if inPth is None:
             
          
     def prepareHazard(self, hazard):
@@ -203,25 +224,6 @@ class eruption:
         #         data = np.round(src.read(1)/(scalingFactor**2))
         #         src.write(data.astype(rio.int32))  
                 
-    def asc2tif(self, inPth, outPth):
-        # Read asc file and set CRS with Rasterio. This is the only way I found to properly set a crs to a .asc file
-        inPth = hazard['files'][i]
-        outPth = '{}/_tmp/crs.tif'.format(self.name)
-
-        # Setting up projection
-        print('  - Setting up projection EPSG:{}'.format(hazard['epsg']))
-        with rio.open(inPth, mode='r+') as tmp:
-            tmp.crs = rio.crs.CRS.from_epsg(hazard['epsg'])
-
-            out_meta = tmp.meta.copy()
-            out_meta.update({"driver": "GTiff",
-                            "height": tmp.height,
-                            "width": tmp.width})
-
-            # Good to know: use  .read() to access underlying data
-            with rio.open(outPth, 'w', **out_meta) as dest:
-                dest.write(tmp.read())
-    
     def makeInputFileName(self, rootDir, nameConstructor):
         ''' Create list of filenames based on nameConstructor '''
         flName = []
@@ -231,4 +233,34 @@ class eruption:
             flName.append(fl)
         return flName
     
- 
+def makeZoneBoundaries(x, y, xmin, xmax, ymin, ymax):
+        """ Calculates the boundaries in m from a central point. Useful when
+            a boundary falls outside the limit of the zone defined by the central
+            point.
+        
+        Args:
+            x (float): Easting of the central point
+            y (float): Northing of the central point
+            minx (float): Minimum Easting of the bounding box
+            maxx (float): Maximum Easting of the bounding box
+            miny (float): Minimum Northing of the bounding box
+            maxy (float): Maximum Northing of the bounding box
+
+        """
+        
+        if xmin<0:
+            xmin = -1*(round(x))+xmin
+        else:
+            xmin = round(x)-xmin
+        
+        xmax = xmax - x
+        
+        if ymin<0:
+            ymin = -1*(round(x))+ymin
+        else:
+            ymin = round(x)-ymin
+            
+        ymax = ymax - y
+        
+        return xmin, xmax, ymin, ymax
+             

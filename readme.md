@@ -23,6 +23,11 @@ pip install utm
 
 ## Basic commands
 
+### Import
+```python
+import volcgis
+```
+
 ### Defining and initializing an eruption
 
 An eruption is defined with a dictionary, e.g.:
@@ -58,7 +63,7 @@ erup = volcgis.eruption(eruption, res)
 Where:
 - `res` is the reference resolution (m)
 
-### Defining and pre-processing a hazard
+### Defining and pre-processing a hazard type
 
 A hazard first requires the definition of a `nameConstructor` to retrieve hazard model outputs, e.g.:
 
@@ -89,8 +94,8 @@ The hazard is the defined with another dictionary, e.g.:
 
 ```python
 tephra = {
-    'hazard':     'Tephra',
-    'epsg':       32748,
+    'hazard':    'Tephra',
+    'epsg':      32748,
     'rootDir':   'hazards/Tephra/',
     'nameConstructor': nameConstructor,
     }
@@ -118,7 +123,8 @@ Essentially, this step:
     - `___hazardName` is `hazard.hazard`
 
 ### Retrieving exposure data
-Reproject, crop and align extent based on `erup.area`/`erup.epsg` and saves subset in `volcanoes/___volcanoName/_data/`
+Reproject, crop and align extent based on `erup.area`/`erup.epsg` and saves subset in `volcanoes/___volcanoName/_data/`. In all cases, a custom path to the source dataset can be specified with the named keyword argument `inPth`.
+
 #### Landscan
 
 ```python
@@ -145,3 +151,4 @@ pop.close()
 ```python
 erup.getLandcover()
 ```
+

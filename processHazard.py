@@ -9,6 +9,8 @@ from pyproj import CRS
 from pyproj import Transformer
 import numpy as np
 import utm
+from printy import printy
+import fiona
 
 # Tephra thresholds
 # Josh: 1, 100
@@ -20,10 +22,10 @@ volcDB = pd.read_csv('volcCoordinates.csv')
 res = 90
 
 # Steps selection
-processTephra = True
-processBAF = True
-processPDC = True
-processLC = True
+processTephra = False
+processBAF = False
+processPDC = False
+processLC = False
 
 analyzeTephra = True
 analyzeBAF = True
@@ -34,7 +36,8 @@ analyzeLC = True
 VEI = [3,4,5]
 probT = [10,50,90]
 intT = [1,5,50,100]
-buffT = ['0.009', '0.0027']
+# buffT = ['0.009', '0.0027']
+buffT = ['300', '990']
 volT = ['9800000', '450000']
 
 # Exposure storage
@@ -71,20 +74,6 @@ def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volu
     expTmp = pd.DataFrame(expTmp)
     return EXPOSURE.append(expTmp)
     
-    
-# def updateExposure(exposure, volcano, hazard, VEI, prob, intensity, buffer, volume, pop, crops, urban):
-#     exposure['volcano'].append(volcano)
-#     exposure['hazard'].append(hazard)
-#     exposure['VEI'].append(VEI)
-#     exposure['prob'].append(prob)
-#     exposure['mass'].append(intensity)
-#     exposure['pop_count'].append(pop)
-#     exposure['area_crops'].append(crops)
-#     exposure['area_urban'].append(urban)
-#     exposure['buffer'].append(buffer)
-#     exposure['volume'].append(volume)
-#     return exposure
-
 def getExposure(haz_data, pop_data, LC_data, val):
     # Get hazard index
     idx = haz_data >= val
@@ -99,20 +88,23 @@ def getExposure(haz_data, pop_data, LC_data, val):
     urbanTmp = np.sum(idx)*res**2/1e6
     
     return popTmp, cropsTmp, urbanTmp
-                        
-                        
+                                            
 for i in range(0, volcDB.shape[0]):
-    print(volcDB.loc[i, 'name'].upper())
+# for i in range(9,11):
+    printy(volcDB.loc[i, 'name'].upper(), 'cB')
     lat = volcDB.loc[i, 'lat']
     lon = volcDB.loc[i, 'lon']
     name = volcDB.loc[i, 'name']
     
     # Find the espg
-    zone = utm.from_latlon(lat,lon)  
+    # zone = utm.from_latlon(lat,lon)  
+    zone = int(np.ceil((lon+180)/6))
     if lat<0:
-        crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': True})
+        # crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': True})
+        crs = CRS.from_dict({'proj': 'utm', 'zone': zone, 'south': True})
     else:
-        crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': False})
+        # crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': False})
+        crs = CRS.from_dict({'proj': 'utm', 'zone': zone, 'south': False})
     epsg = crs.to_authority()
     epsg = int(epsg[1])
     
@@ -120,24 +112,15 @@ for i in range(0, volcDB.shape[0]):
     transformer = Transformer.from_crs(4326, epsg)
     [xtmp, ytmp] = transformer.transform(lat, lon)
     
-    # Find region extent
-    if volcDB.loc[i, 'xmin'] < 0 :
-        dxMin = round(xtmp + abs(volcDB.loc[i, 'xmin']))
-    else:
-        dxMin = round(xtmp - volcDB.loc[i, 'xmin'])
-    dxMax = round(volcDB.loc[i, 'xmax'] - xtmp)
-    
-    if volcDB.loc[i, 'ymin'] < 0 :
-        dyMin = round(ytmp + abs(volcDB.loc[i, 'ymin']))
-    else:
-        dyMin = round(ytmp - volcDB.loc[i, 'ymin'])
-    dyMax = round(volcDB.loc[i, 'ymax'] - ytmp)
-        
+    # Find region extent        
+    dxMin, dxMax, dyMin, dyMax = volcgis.makeZoneBoundaries(xtmp, ytmp, 
+                                                         volcDB.loc[i, 'xmin'], volcDB.loc[i, 'xmax'],
+                                                         volcDB.loc[i, 'ymin'], volcDB.loc[i, 'ymax'])
     # Setup eruption dictionary. 
     eruption = {
         'name':     name,
         'vent':     [lat, lon, 2765], # Vent lat, lon and elevation
-        'extent':   [dxMin, dxMax, dyMin, dyMax], # extent around vent in meters, [minx maxx miny maxy]
+        'extent':   [volcDB.loc[i, 'xmin'], volcDB.loc[i, 'xmax'], volcDB.loc[i, 'ymin'], volcDB.loc[i, 'ymax']], # extent around vent in meters, [minx maxx miny maxy]
         'epsg':     epsg
     }
 
@@ -166,7 +149,7 @@ for i in range(0, volcDB.shape[0]):
     if processBAF:
         nameConstructor = {
             'volcano':    [name],
-            'buffer':     ['0.0027deg', '0.009deg'],
+            'buffer':     ['300m_buff', '990m_buff'],
             'volume':     ['9800000m3', '450000m3'],
             'format':     ['.tif']
         }
@@ -258,7 +241,7 @@ for i in range(0, volcDB.shape[0]):
     if analyzeBAF: 
         for iV in volT:
             for iB in buffT:
-                fl = 'volcanoes/{}/_hazard/BAF/{}_{}deg_{}m3.tif'.format(erup.name, erup.name, iB, iV)
+                fl = 'volcanoes/{}/_hazard/BAF/{}_{}m_buff_{}m3.tif'.format(erup.name, erup.name, iB, iV)
                 with rio.open(fl) as haz:
                     haz_data = haz.read(1)
                     for iP in probT:
@@ -295,3 +278,45 @@ EXPOSURE.to_csv('results.csv')
 
 
 
+#%% Debugging and prepping for integration of Josh's code
+
+
+flpth = '/Users/seb/Documents/Codes/VolcGIS/volcanoes/Gede-Pangrango/_hazard/Tephra/Gede-Pangrango_VEI5_P5.tif'
+schema = {"geometry": "Polygon", "properties": {"value": "int"}}
+
+with rio.open(flpth) as src:
+    image = src.read()
+    # use your function to generate mask
+    mask = image >=1
+    # and convert to uint8 for rio.features.shapes
+    mask = mask.astype('uint8')
+    shapes = rio.features.shapes(mask, transform=src.transform)
+    # select the records from shapes where the value is 1,
+    # or where the mask was True
+    # records = [(geometry,value) for (geometry, value) in shapes if value == 1]
+    # records = [geom for (geom, value) in shapes if value == 1]
+    # records = [geometry.Polygon([geom[0], geom[1]]) for (geom, value) in shapes if value == 1]
+    
+    # records = [{"geometry": geometry, "properties": {"value": value}}
+    #            for (geometry, value) in shapes if value == 1]
+    # with fiona.open('test.shp', "w", "ESRI Shapefile",
+    #                 crs=src.crs.data, schema=schema) as out_file:
+    #     out_file.writerecords(records)
+        
+        
+#%%
+from shapely.geometry import shape
+
+# read the shapes as separate lists
+geometry = []
+for shapedict, value in shapes:
+    if value == 1:
+        geometry.append(shape(shapedict))
+        
+gdf = gpd.GeoDataFrame(
+    {'geometry': geometry },
+    crs="EPSG:32748"
+)
+
+gdf.plot()
+# %%

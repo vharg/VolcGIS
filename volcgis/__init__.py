@@ -150,18 +150,31 @@ class eruption:
         # if inPth is None:
             
     def getRoadExposure(self, inPth=None):
+        """
+
+        Argumentss:
+            inPth (str): Path to the main roads dataset
+
+        Returns:
+            roads (feather): A feather file of the roads within BBox
+
+        """
         
         # Re-project self.areaG to pseudo mercator 3857
-        bbox = self.area.to_crs(from_epsg(3857)) # Project it
+        bbox = self.area.to_crs(from_epsg(3857))
 
-        # Get bbox for thi geometry
-        gpd.read_file( bbox=bbox['geometry'])
-        
-        # Read osm data with bbox from inPth
-        # Hi there!
+        # Get bbox for the geometry
+        if inPth is None:
+            inPth = 'DATA/SEA_roads_criticality.gpkg'
+
+        roads = gpd.read_file(inPth, bbox=bbox['geometry'])
+
         # Reproject to self.EPSG
-        
-        # Save to outPth
+        roads.to_crs(self.EPSG)
+
+        # Save as a feather to outPth
+        outPth = os.path.join('volcanoes', self.name, '_data', 'roads.feather')
+        roads.to_feather(outPth)
          
     def prepareHazard(self, hazard):
         """ Prepare the hazard layers

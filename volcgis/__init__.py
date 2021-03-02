@@ -106,46 +106,46 @@ class eruption:
 
     def getLandscan(self, inPth=None):
         """ Retrieves Landscan data for the area defined by self.area.
-        
+
         Arguments:
             inPth (str): Path to corresponding raster
 
         Output:
-            
+
         """
         if inPth is None:
             inPth = 'DATA/Landscan.tif'
 
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landscan.tif')
-        
+
         originalRes = 1000 # Landscan resolution
         scaling = originalRes / self.res # Scaling factor to correct population
-        
+
         self.alignRaster(inPth, outPth, resampling='nearest', scalingFactor=scaling)
 
     def getLandcover(self, inPth=None):
         """ Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
-        
+
         Arguments:
             inPth (str): Path to corresponding raster
 
         Output:
-            
+
         """
         if inPth is None:
             inPth = 'DATA/LC100_2018_croped.tif'
 
         outPth = os.path.join('volcanoes', self.name, '_data', 'Landcover.tif')
         self.alignRaster(inPth, outPth, resampling='nearest')
-        
+
     def getBuildingExposure(self, inPth=None):
         """ Retrieves building exposure from George's analysis for area defined by self.area.
-        
+
         Arguments:
             inPth (str): Path to corresponding raster
 
         Output:
-            
+
         """
         # if inPth is None:
             
@@ -170,7 +170,7 @@ class eruption:
         roads = gpd.read_file(inPth, bbox=bbox['geometry'])
 
         # Reproject to self.EPSG
-        roads.to_crs(self.EPSG)
+        roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
 
         # Save as a feather to outPth
         outPth = os.path.join('volcanoes', self.name, '_data', 'roads.feather')
@@ -178,16 +178,16 @@ class eruption:
          
     def prepareHazard(self, hazard):
         """ Prepare the hazard layers
-        
+
             Loads the files for a given hazard defined as hazard['hazard'] and from hazard['nameConstructor'] from the hazards/ folder.
-        
+
             Args:
                 hazard (dict): Main hazard dictionary
 
             Returns:
                 Geotif
         """
-        
+
         print('Preparing hazard: {}'.format(hazard['hazard']))
         # Set path and folders
         targetDir = os.path.join('volcanoes', self.name, '_hazard', hazard['hazard'])
@@ -196,14 +196,14 @@ class eruption:
 
         # Create a list of file names
         hazard['files'] = self.makeInputFileName(hazard['rootDir'], hazard['nameConstructor'])
-        
+
         # Align files
         for inPth in hazard['files']:
             outPth = inPth.replace(hazard['rootDir'], '')
             outPth = outPth.replace('.asc', '.tif')
             outPth = 'volcanoes/{}/_hazard/{}/{}'.format(self.name, hazard['hazard'], outPth)
             print('  - Processing: {}'.format(outPth))
-            
+
             # If asc file, need to define projection
             # if inPth[-3:] == 'asc':
             #     inPth = asc2raster(inPth, hazard
@@ -211,15 +211,15 @@ class eruption:
             self.alignRaster(inPth, outPth, epsg=hazard['epsg'])
 
     def alignRaster(self, inPth, outPth, epsg=None, resampling='cubic', scalingFactor=None):
-        """ 
+        """
             Aligns raster to a reference grid using a virtual wrap. Use reference contained in self.ref to read a window of original file and wrap it
-        
+
             Args:
                 inPth (str): Path to input raster
                 outPth (str): Path to output raster
                 resampling (str): Resampling method
-                scalingFactor (float): 
-        
+                scalingFactor (float):
+
         """
         # Virtual wrapper options
         vrt_options = {
@@ -230,10 +230,10 @@ class eruption:
             'width': self.ref['width'],
             'driver': 'GTiff'
         }
-        
+
         if resampling == 'nearest':
             vrt_options['resampling'] = Resampling.nearest
-            
+
         with rio.open(inPth, 'r+') as src:
             # In case no EPSG is specified (e.g. asc)
             if src.crs == None:
@@ -242,14 +242,14 @@ class eruption:
             with WarpedVRT(src, **vrt_options) as vrt:
                 rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], self.ref['transform']))
                 # rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], src.transform))
-  
-                rio_shutil.copy(vrt, outPth, driver='GTiff', compress='lzw')    
-        
+
+                rio_shutil.copy(vrt, outPth, driver='GTiff', compress='lzw')
+
         # if scalingFactor is not None:
-        #     with rio.open(outPth, 'w', **profile) as src:  
+        #     with rio.open(outPth, 'w', **profile) as src:
         #         data = np.round(src.read(1)/(scalingFactor**2))
-        #         src.write(data.astype(rio.int32))  
-                
+        #         src.write(data.astype(rio.int32))
+
     def makeInputFileName(self, rootDir, nameConstructor):
         ''' Create list of filenames based on nameConstructor '''
         flName = []
@@ -258,12 +258,12 @@ class eruption:
             fl = rootDir+fl[:-5]+fl[-4:]
             flName.append(fl)
         return flName
-    
+
 def makeZoneBoundaries(x, y, xmin, xmax, ymin, ymax):
         """ Calculates the boundaries in m from a central point. Useful when
             a boundary falls outside the limit of the zone defined by the central
             point.
-        
+
         Args:
             x (float): Easting of the central point
             y (float): Northing of the central point
@@ -273,20 +273,20 @@ def makeZoneBoundaries(x, y, xmin, xmax, ymin, ymax):
             maxy (float): Maximum Northing of the bounding box
 
         """
-        
+
         if xmin<0:
             xmin = -1*(round(x))+xmin
         else:
             xmin = round(x)-xmin
-        
+
         xmax = xmax - x
-        
+
         if ymin<0:
             ymin = -1*(round(x))+ymin
         else:
             ymin = round(x)-ymin
-            
+
         ymax = ymax - y
-        
+
         return xmin, xmax, ymin, ymax
              

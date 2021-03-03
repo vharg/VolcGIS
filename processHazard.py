@@ -17,8 +17,11 @@ import fiona
 # Ag/Hort: 1, 5, 50
 # Forest: 5, 200, 1000
 
-#%%
+#%% 
+# Read the master csv file containing all the volcanoes
+# The file contains these columns: name,lat,lon,xmin,xmax,ymin,ymax,country
 volcDB = pd.read_csv('volcCoordinates.csv')
+# The main resolution used across all rasters
 res = 90
 
 # Steps selection
@@ -36,7 +39,6 @@ analyzeLC = True
 VEI = [3,4,5]
 probT = [10,50,90]
 intT = [1,5,50,100]
-# buffT = ['0.009', '0.0027']
 buffT = ['300', '990']
 volT = ['9800000', '450000']
 
@@ -75,6 +77,10 @@ def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volu
     return EXPOSURE.append(expTmp)
     
 def getExposure(haz_data, pop_data, LC_data, val):
+    """ Get exposure 
+    
+    """
+    
     # Get hazard index
     idx = haz_data >= val
     # Population
@@ -83,27 +89,27 @@ def getExposure(haz_data, pop_data, LC_data, val):
     # Landcover / crops km2
     idx = (haz_data >= val) & (LC_data==40)
     cropsTmp = np.sum(idx)*res**2/1e6
+    
     # Landcover / urban km2
     idx = (haz_data >= val) & (LC_data==50)
     urbanTmp = np.sum(idx)*res**2/1e6
     
+    # 
+    
     return popTmp, cropsTmp, urbanTmp
-                                            
+
+# Main loop through volcanoes                                            
 for i in range(0, volcDB.shape[0]):
-# for i in range(9,11):
     printy(volcDB.loc[i, 'name'].upper(), 'cB')
     lat = volcDB.loc[i, 'lat']
     lon = volcDB.loc[i, 'lon']
     name = volcDB.loc[i, 'name']
     
     # Find the espg
-    # zone = utm.from_latlon(lat,lon)  
     zone = int(np.ceil((lon+180)/6))
     if lat<0:
-        # crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': True})
         crs = CRS.from_dict({'proj': 'utm', 'zone': zone, 'south': True})
     else:
-        # crs = CRS.from_dict({'proj': 'utm', 'zone': zone[2], 'south': False})
         crs = CRS.from_dict({'proj': 'utm', 'zone': zone, 'south': False})
     epsg = crs.to_authority()
     epsg = int(epsg[1])
@@ -124,6 +130,7 @@ for i in range(0, volcDB.shape[0]):
         'epsg':     epsg
     }
 
+    # Define the eruption
     erup = volcgis.eruption(eruption, res)
 
 
@@ -214,19 +221,22 @@ for i in range(0, volcDB.shape[0]):
     # PREPARE EXPOSURE DATA
     erup.getLandcover()
     erup.getLandscan()
-    # erup.getRoadExposure()
+    erup.getRoadExposure(inPth='DATA/SEA_roads_criticality.gpkg')
     
     
-    # Exposure analysis
-    LCf = 'volcanoes/{}/_data/Landcover.tif'.format(erup.name)
-    popf = 'volcanoes/{}/_data/Landscan.tif'.format(erup.name)
+    # EXPOSURE ANALYSIS
     
-    LC = rio.open(LCf)
-    pop = rio.open(popf)
-    
-    LC_data = LC.read(1)
-    pop_data = pop.read(1)/(1000/res)**2
-    pop_data[pop_data<1] = 0
+    # If any exposure analysis is required, load the data
+    if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
+        LCf = 'volcanoes/{}/_data/Landcover.tif'.format(erup.name)
+        popf = 'volcanoes/{}/_data/Landscan.tif'.format(erup.name)
+        
+        LC = rio.open(LCf)
+        pop = rio.open(popf)
+        
+        LC_data = LC.read(1)
+        pop_data = pop.read(1)/(1000/res)**2
+        pop_data[pop_data<1] = 0
     
     if analyzeTephra:
         for iVEI in VEI:
@@ -236,7 +246,6 @@ for i in range(0, volcDB.shape[0]):
                     haz_data = haz.read(1)
                     for iM in intT:
                         popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iM)
-                        # exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp)
                         EXPOSURE = updateExposure(EXPOSURE, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp)
     
     if analyzeBAF: 
@@ -247,7 +256,6 @@ for i in range(0, volcDB.shape[0]):
                     haz_data = haz.read(1)
                     for iP in probT:
                         popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                        # exposure = updateExposure(exposure, erup.name, 'BAF', None, iP, None, iB, iV, popTmp, cropsTmp, urbanTmp)
                         EXPOSURE = updateExposure(EXPOSURE, erup.name, 'BAF', None, iP, None, iB, iV, popTmp, cropsTmp, urbanTmp)
 
     if analyzePDC: 
@@ -257,7 +265,6 @@ for i in range(0, volcDB.shape[0]):
                 haz_data = haz.read(1)
                 for iP in probT:
                     popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                    # # exposure = updateExposure(exposure, erup.name, 'PDC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
                     EXPOSURE = updateExposure(EXPOSURE, erup.name, 'PDC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
     
     if analyzeLC: 
@@ -267,7 +274,6 @@ for i in range(0, volcDB.shape[0]):
                 haz_data = haz.read(1)
                 for iP in probT:
                     popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                    # exposure = updateExposure(exposure, erup.name, 'LC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
                     EXPOSURE = updateExposure(EXPOSURE, erup.name, 'LC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
  
     LC.close()

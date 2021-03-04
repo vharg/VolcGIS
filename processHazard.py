@@ -37,7 +37,8 @@ processLC = False
 
 processLandCover = False
 processLandScan = False 
-processRoadNetwork = True
+processRoadNetwork = False
+processBuildings = True
 
 analyzeTephra = False
 analyzeBAF = False
@@ -205,6 +206,10 @@ for i in range(0, volcDB.shape[0]):
     if processRoadNetwork:
         erup.getRoadNetwork()
     if processBuildings:
+        erup.getBuildingExposure(inPath = 'DATA/buildings_strong_{}.tif'.format(volcDB.iloc[i].country),
+                                 outPath = os.path.join(erup.outPath, erup.name, '_data/buildings_strong.tif'))
+        erup.getBuildingExposure(inPath = 'DATA/buildings_weak_{}.tif'.format(volcDB.iloc[i].country),
+                                 outPath = os.path.join(erup.outPath, erup.name, '_data/buildings_weak.tif'))
         
     
     # Exposure analysis
@@ -308,12 +313,14 @@ for i in range(0, volcDB.shape[0]):
                     popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
                     EXPOSURE = updateExposure(EXPOSURE, erup.name, 'LC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
 
-    # Close connection to rasters
-    LC.close()
-    pop.close()
-    
-    # Write the RSDS for each volcano
-    RSDS.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/RSDS.csv')
+    if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
+        # Close connection to rasters
+        LC.close()
+        pop.close()
+        
+        # Write the RSDS for each volcano
+        RSDS.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/RSDS.csv'))
         
 
-EXPOSURE.to_csv('results.csv')
+# EXPOSURE.to_csv('results.csv')
+# %%

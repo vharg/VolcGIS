@@ -34,25 +34,29 @@ os.chdir('/Users/seb/Documents/Codes/VolcGIS')
 
 #%%
 class eruption:
-    def __init__(self, eruption, masterRes):
+    def __init__(self, eruption, masterRes, outPath=None):
         ''' Sets main eruption object.
         
         Params:
             eruption (dict): Eruption dictionary
             masterRes (int): Cell size (m)
-            
+            outPath (str): Master folder for output path. If None, default is './volcanoes'
         '''
+        
+
+        self.outPath = 'volcanoes' if outPath == None else outPath
         
         # Set default variables
         self.name = eruption['name']
         self.res = masterRes
 
         # Set path and folders
-        if not os.path.exists(os.path.join('volcanoes', self.name)):
-            os.mkdir(os.path.join('volcanoes', self.name))
-            os.mkdir(os.path.join('volcanoes', self.name, '_data'))
-            os.mkdir(os.path.join('volcanoes', self.name, '_tmp'))
-            os.mkdir(os.path.join('volcanoes', self.name, '_hazard'))
+        if not os.path.exists(os.path.join(self.outPath, self.name)):
+            os.mkdir(os.path.join(self.outPath, self.name))
+            os.mkdir(os.path.join(self.outPath, self.name, '_data'))
+            os.mkdir(os.path.join(self.outPath, self.name, '_tmp'))
+            os.mkdir(os.path.join(self.outPath, self.name, '_hazard'))
+        os.mkdir(os.path.join(self.outPath, self.name, '_exposure'))
 
         # Define projections
         self.EPSG = eruption['epsg']
@@ -104,56 +108,56 @@ class eruption:
         self.ref['transform'] = affine.Affine(self.res, 0.0, self.ref['bounds'][0], 0.0, -self.res, self.ref['bounds'][3])
         self.ref['EPSG'] = rio.crs.CRS.from_epsg(self.EPSG)
 
-    def getLandscan(self, inPth=None):
+    def getLandscan(self, inPath=None):
         """ Retrieves Landscan data for the area defined by self.area.
 
         Arguments:
-            inPth (str): Path to corresponding raster
+            inPath (str): Path to corresponding raster
 
         Output:
 
         """
-        if inPth is None:
-            inPth = 'DATA/Landscan.tif'
+        if inPath is None:
+            inPath = 'DATA/Landscan.tif'
 
-        outPth = os.path.join('volcanoes', self.name, '_data', 'Landscan.tif')
+        outPth = os.path.join(self.outPath, self.name, '_data', 'Landscan.tif')
 
         originalRes = 1000 # Landscan resolution
         scaling = originalRes / self.res # Scaling factor to correct population
 
-        self.alignRaster(inPth, outPth, resampling='nearest', scalingFactor=scaling)
+        self.alignRaster(inPath, outPth, resampling='nearest', scalingFactor=scaling)
 
-    def getLandcover(self, inPth=None):
+    def getLandcover(self, inPath=None):
         """ Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
 
         Arguments:
-            inPth (str): Path to corresponding raster
+            inPath (str): Path to corresponding raster
 
         Output:
 
         """
-        if inPth is None:
-            inPth = 'DATA/LC100_2018_croped.tif'
+        if inPath is None:
+            inPath = 'DATA/LC100_2018_croped.tif'
 
-        outPth = os.path.join('volcanoes', self.name, '_data', 'Landcover.tif')
-        self.alignRaster(inPth, outPth, resampling='nearest')
+        outPth = os.path.join(self.outPath, self.name, '_data', 'Landcover.tif')
+        self.alignRaster(inPath, outPth, resampling='nearest')
 
-    def getBuildingExposure(self, inPth=None):
+    def getBuildingExposure(self, inPath=None):
         """ Retrieves building exposure from George's analysis for area defined by self.area.
 
         Arguments:
-            inPth (str): Path to corresponding raster
+            inPath (str): Path to corresponding raster
 
         Output:
 
         """
-        # if inPth is None:
+        # if inPath is None:
             
-    def getRoadNetwork(self, inPth=None):
+    def getRoadNetwork(self, inPath=None):
         """
 
-        Argumentss:
-            inPth (str): Path to the main roads dataset
+        Arguments:
+            inPath (str): Path to the main roads dataset
 
         Returns:
             roads (feather): A feather file of the roads within BBox
@@ -164,16 +168,16 @@ class eruption:
         bbox = self.area.to_crs(from_epsg(3857))
 
         # Get bbox for the geometry
-        if inPth is None:
-            inPth = 'DATA/SEA_roads_criticality.gpkg'
+        if inPath is None:
+            inPath = 'DATA/SEA_roads_criticality.gpkg'
 
-        roads = gpd.read_file(inPth, bbox=bbox['geometry'])
+        roads = gpd.read_file(inPath, bbox=bbox['geometry'])
 
         # Reproject to self.EPSG
         roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
 
         # Save as a feather to outPth
-        outPth = os.path.join('volcanoes', self.name, '_data', 'roads.feather')
+        outPth = os.path.join(self.outPath, self.name, '_data', 'roads.feather')
         roads.to_feather(outPth)
          
     def prepareHazard(self, hazard):
@@ -190,7 +194,7 @@ class eruption:
 
         print('Preparing hazard: {}'.format(hazard['hazard']))
         # Set path and folders
-        targetDir = os.path.join('volcanoes', self.name, '_hazard', hazard['hazard'])
+        targetDir = os.path.join(self.outPath, self.name, '_hazard', hazard['hazard'])
         if not os.path.exists(targetDir):
             os.mkdir(targetDir)
 
@@ -198,24 +202,24 @@ class eruption:
         hazard['files'] = self.makeInputFileName(hazard['rootDir'], hazard['nameConstructor'])
 
         # Align files
-        for inPth in hazard['files']:
-            outPth = inPth.replace(hazard['rootDir'], '')
+        for inPath in hazard['files']:
+            outPth = inPath.replace(hazard['rootDir'], '')
             outPth = outPth.replace('.asc', '.tif')
             outPth = 'volcanoes/{}/_hazard/{}/{}'.format(self.name, hazard['hazard'], outPth)
             print('  - Processing: {}'.format(outPth))
 
             # If asc file, need to define projection
-            # if inPth[-3:] == 'asc':
-            #     inPth = asc2raster(inPth, hazard
+            # if inPath[-3:] == 'asc':
+            #     inPath = asc2raster(inPath, hazard
             #                        )
-            self.alignRaster(inPth, outPth, epsg=hazard['epsg'])
+            self.alignRaster(inPath, outPth, epsg=hazard['epsg'])
 
-    def alignRaster(self, inPth, outPth, epsg=None, resampling='cubic', scalingFactor=None):
+    def alignRaster(self, inPath, outPth, epsg=None, resampling='cubic', scalingFactor=None):
         """
             Aligns raster to a reference grid using a virtual wrap. Use reference contained in self.ref to read a window of original file and wrap it
 
             Args:
-                inPth (str): Path to input raster
+                inPath (str): Path to input raster
                 outPth (str): Path to output raster
                 resampling (str): Resampling method
                 scalingFactor (float):
@@ -234,7 +238,7 @@ class eruption:
         if resampling == 'nearest':
             vrt_options['resampling'] = Resampling.nearest
 
-        with rio.open(inPth, 'r+') as src:
+        with rio.open(inPath, 'r+') as src:
             # In case no EPSG is specified (e.g. asc)
             if src.crs == None:
                 #  src.crs = 'EPSG:{}'.format(epsg)

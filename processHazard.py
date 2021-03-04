@@ -1,5 +1,6 @@
 #%%
 import os
+import sys
 os.chdir('/Users/seb/Documents/Codes/VolcGIS')
 import volcgis 
 from volcgis.exposureAnalysis import *
@@ -14,7 +15,7 @@ from printy import printy
 import fiona
 import geopandas as gpd
 from shapely.geometry import shape
-from alive_progress import alive_bar
+# from alive_progress import alive_bar
 import time
 
 # Tephra thresholds
@@ -38,7 +39,7 @@ processLC = False
 processLandCover = False
 processLandScan = False 
 processRoadNetwork = False
-processBuildings = True
+processBuildings = False
 
 analyzeTephra = False
 analyzeBAF = False
@@ -75,9 +76,17 @@ exposure['RNDS'] = []
 
 EXPOSURE = pd.DataFrame(exposure)
 
-#%% Main loop through volcanoes                                            
+#%% Main processing step            
 
-for i in range(0, volcDB.shape[0]):
+# Handling if the function is called from the command line                          
+if len(sys.argv) > 2:
+    rng = range(0, volcDB.shape[0])
+else:
+    rng = range(int(sys.argv[1]), int(sys.argv[1])+1)
+
+# Loop through volcanoes          
+for i in rng:
+    tic = time.perf_counter() # Start counter
     printy(volcDB.loc[i, 'name'].upper(), 'cB')
     lat = volcDB.loc[i, 'lat']
     lon = volcDB.loc[i, 'lon']
@@ -232,8 +241,11 @@ for i in range(0, volcDB.shape[0]):
         pop_data[pop_data<1] = 0
     
     if analyzeTephra:
+        printy(' - Processing tephra...')
         for iVEI in VEI:
             for iP in probT:
+                printy('   - VEI: {} - Prob: {}...'.format(iVEI, iP))
+                
                 # Define hazard file
                 fl = os.path.join(erup.outPath, erup.name, '_hazard/Tephra/{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(10-iP/10)))
                 # Get the road disruption
@@ -260,8 +272,10 @@ for i in range(0, volcDB.shape[0]):
                             EXPOSURE = updateExposure(EXPOSURE, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp, None, None)
     
     if analyzeBAF:
+        printy(' - Processing BAF...')
         for iV in volT:
             for iB in buffT:
+                printy('   - Volume: {} - Buffer: {}...'.format(iV, iB))
                 # Define hazard file
                 fl = os.path.join(erup.outPath, erup.name, '_hazard/BAF/{}_{}m_buff_{}m3.tif'.format(erup.name, iB, iV))
                 # Get the road disruption
@@ -283,7 +297,9 @@ for i in range(0, volcDB.shape[0]):
                         EXPOSURE = updateExposure(EXPOSURE, erup.name, 'BAF', None, iP, None, iB, iV, popTmp, cropsTmp, urbanTmp, rnds[iP/100], roadLength[[iP/100]])
 
     if analyzePDC:
+        printy(' - Processing PDC...')
         for iVEI in VEI:
+            printy('   - VEI: {}...'.format(iVEI))
             # Define hazard file
             fl = os.path.join(erup.outPath, erup.name, '_hazard/PDC/{}_{}_output_map.tif'.format(erup.name, iVEI))
             # Get the road disruption
@@ -305,7 +321,10 @@ for i in range(0, volcDB.shape[0]):
                     EXPOSURE = updateExposure(EXPOSURE, erup.name, 'PDC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp, rnds[iP/100], roadLength[[iP/100]])
     
     if analyzeLC: 
+        printy(' - Processing lapilli...')
         for iVEI in VEI:
+            printy('   - VEI: {}...'.format(iVEI))
+            # Define hazard file
             fl = os.path.join(erup.outPath, erup.name, '_hazard/LC/{}_VEI{}.tif'.format(erup.name, iVEI))
             with rio.open(fl) as haz:
                 haz_data = haz.read(1)
@@ -318,9 +337,11 @@ for i in range(0, volcDB.shape[0]):
         LC.close()
         pop.close()
         
-        # Write the RSDS for each volcano
+        # Write the exposure for each volcano
         RSDS.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/RSDS.csv'))
-        
-
+        EXPOSURE.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/{}.csv').format(erup.name))
+    
+    toc = time.perf_counter() # Stop counter
+    print(f" Time: {toc - tic:0.0f} seconds")
 # EXPOSURE.to_csv('results.csv')
 # %%

@@ -56,8 +56,8 @@ class eruption:
             os.mkdir(os.path.join(self.outPath, self.name, '_data'))
             os.mkdir(os.path.join(self.outPath, self.name, '_tmp'))
             os.mkdir(os.path.join(self.outPath, self.name, '_hazard'))
-        os.mkdir(os.path.join(self.outPath, self.name, '_exposure'))
-
+            os.mkdir(os.path.join(self.outPath, self.name, '_exposure'))
+        
         # Define projections
         self.EPSG = eruption['epsg']
         # self.EPSG_geo = pyproj.CRS('EPSG:{}'.format(4326))
@@ -120,12 +120,12 @@ class eruption:
         if inPath is None:
             inPath = 'DATA/Landscan.tif'
 
-        outPth = os.path.join(self.outPath, self.name, '_data', 'Landscan.tif')
+        outPath = os.path.join(self.outPath, self.name, '_data', 'Landscan.tif')
 
         originalRes = 1000 # Landscan resolution
         scaling = originalRes / self.res # Scaling factor to correct population
 
-        self.alignRaster(inPath, outPth, resampling='nearest', scalingFactor=scaling)
+        self.alignRaster(inPath, outPath, resampling='nearest', scalingFactor=scaling)
 
     def getLandcover(self, inPath=None):
         """ Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
@@ -139,10 +139,10 @@ class eruption:
         if inPath is None:
             inPath = 'DATA/LC100_2018_croped.tif'
 
-        outPth = os.path.join(self.outPath, self.name, '_data', 'Landcover.tif')
-        self.alignRaster(inPath, outPth, resampling='nearest')
+        outPath = os.path.join(self.outPath, self.name, '_data', 'Landcover.tif')
+        self.alignRaster(inPath, outPath, resampling='nearest')
 
-    def getBuildingExposure(self, inPath=None):
+    def getBuildingExposure(self, inPath=None, outPath=None):
         """ Retrieves building exposure from George's analysis for area defined by self.area.
 
         Arguments:
@@ -151,6 +151,7 @@ class eruption:
         Output:
 
         """
+        self.alignRaster(inPath, outPath, resampling='nearest')
         # if inPath is None:
             
     def getRoadNetwork(self, inPath=None):
@@ -176,9 +177,9 @@ class eruption:
         # Reproject to self.EPSG
         roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
 
-        # Save as a feather to outPth
-        outPth = os.path.join(self.outPath, self.name, '_data', 'roads.feather')
-        roads.to_feather(outPth)
+        # Save as a feather to outPath
+        outPath = os.path.join(self.outPath, self.name, '_data', 'roads.feather')
+        roads.to_feather(outPath)
          
     def prepareHazard(self, hazard):
         """ Prepare the hazard layers
@@ -203,24 +204,24 @@ class eruption:
 
         # Align files
         for inPath in hazard['files']:
-            outPth = inPath.replace(hazard['rootDir'], '')
-            outPth = outPth.replace('.asc', '.tif')
-            outPth = 'volcanoes/{}/_hazard/{}/{}'.format(self.name, hazard['hazard'], outPth)
-            print('  - Processing: {}'.format(outPth))
+            outPath = inPath.replace(hazard['rootDir'], '')
+            outPath = outPath.replace('.asc', '.tif')
+            outPath = 'volcanoes/{}/_hazard/{}/{}'.format(self.name, hazard['hazard'], outPath)
+            print('  - Processing: {}'.format(outPath))
 
             # If asc file, need to define projection
             # if inPath[-3:] == 'asc':
             #     inPath = asc2raster(inPath, hazard
             #                        )
-            self.alignRaster(inPath, outPth, epsg=hazard['epsg'])
+            self.alignRaster(inPath, outPath, epsg=hazard['epsg'])
 
-    def alignRaster(self, inPath, outPth, epsg=None, resampling='cubic', scalingFactor=None):
+    def alignRaster(self, inPath, outPath, epsg=None, resampling='cubic', scalingFactor=None):
         """
             Aligns raster to a reference grid using a virtual wrap. Use reference contained in self.ref to read a window of original file and wrap it
 
             Args:
                 inPath (str): Path to input raster
-                outPth (str): Path to output raster
+                outPath (str): Path to output raster
                 resampling (str): Resampling method
                 scalingFactor (float):
 
@@ -247,10 +248,10 @@ class eruption:
                 rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], self.ref['transform']))
                 # rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], src.transform))
 
-                rio_shutil.copy(vrt, outPth, driver='GTiff', compress='lzw')
+                rio_shutil.copy(vrt, outPath, driver='GTiff', compress='lzw')
 
         # if scalingFactor is not None:
-        #     with rio.open(outPth, 'w', **profile) as src:
+        #     with rio.open(outPath, 'w', **profile) as src:
         #         data = np.round(src.read(1)/(scalingFactor**2))
         #         src.write(data.astype(rio.int32))
 

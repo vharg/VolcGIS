@@ -26,7 +26,7 @@ import time
 #%% 
 # Read the master csv file containing all the volcanoes
 # The file contains these columns: name,lat,lon,xmin,xmax,ymin,ymax,country
-volcDB = pd.read_csv('volcCoordinates.csv')
+volcDB = pd.read_csv('csv/volcCoordinates.csv')
 # The main resolution used across all rasters
 res = 90
 

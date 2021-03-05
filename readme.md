@@ -23,6 +23,10 @@ pip install utm
 pip install alive-progress
 ```
 
+### Content
+- `csv/`: Root of csv files
+- `plottingApp`: Bokeh function used on WOVODAT
+
 ## Basic commands 
 
 ### Import
@@ -169,3 +173,6 @@ Updated road exposure from Josh's commit. Namely:
 - `getRNDS` now returns three arguments, including `roadLength` and `RSDS`
 - `roadLength` is added to `EXPOSURE`
 - `RSDS` is a pd.DataFrame that contains `RSDS` value for each road segment defined by `Road_ID`. Each column is a different hazard occurrence (i.e. hazard type, VEI, prob etc)
+
+#### `Gekko`
+- Prepared `processHazard.py` for parallel processing on Gekko using Job Arrays

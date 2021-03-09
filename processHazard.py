@@ -24,9 +24,17 @@ import time
 # Forest: 5, 200, 1000
 
 #%% 
+
 # Read the master csv file containing all the volcanoes
 # The file contains these columns: name,lat,lon,xmin,xmax,ymin,ymax,country
 volcDB = pd.read_csv('csv/volcCoordinates.csv')
+
+# Read the vulnerability data
+vuln = pd.read_csv('csv/function_params.csv')
+vuln.columns = ['Country', 'Building_type', 'load_mean', 'load_disp', 'tot_rep_cost']
+vuln['load_mean'] = vuln['load_mean']*101.97 # kPa to kgm-2 
+vuln = vuln.set_index(['Country', 'Building_type'])
+
 # The main resolution used across all rasters
 res = 90
 
@@ -41,10 +49,10 @@ processLandScan = False
 processRoadNetwork = False
 processBuildings = False
 
-analyzeTephra = False
-analyzeBAF = False
-analyzePDC = False
-analyzeLC = False
+analyzeTephra = True
+analyzeBAF = True
+analyzePDC = True
+analyzeLC = True
 
 # Main loops for processing
 VEI = [3,4,5]
@@ -61,20 +69,63 @@ RNDS_probability_map = {0.1: 100,
                     0.5: 100,
                     0.9: 100}
 # Exposure storage
-exposure = {}
-exposure['volcano'] = []
-exposure['hazard'] = []
-exposure['VEI'] = []
-exposure['prob'] = []
-exposure['mass'] = []
-exposure['buffer'] = []
-exposure['volume'] = []
-exposure['pop_count'] = []
-exposure['area_crops'] = []
-exposure['area_urban'] = []
-exposure['RNDS'] = []
+# exposure = {}
+# exposure['volcano'] = []
+# exposure['hazard'] = []
+# exposure['VEI'] = []
+# exposure['prob'] = []
+# exposure['mass'] = []
+# exposure['buffer'] = []
+# exposure['volume'] = []
+# exposure['pop_count'] = []
+# exposure['area_crops'] = []
+# exposure['area_urban'] = []
+# exposure['RNDS'] = []
+# exposure['cost_total'] = []
+# exposure['cost_weak'] = []
+# exposure['cost_strong'] = []
+# exposure['n_weak'] = []
+# exposure['n_strong'] = []
+# EXPOSURE = pd.DataFrame(exposure)
 
-EXPOSURE = pd.DataFrame(exposure)
+
+# damageRatio = {}
+# damageRatio['volcano'] = []
+# damageRatio['VEI'] = []
+# damageRatio['prob'] = []
+# damageRatio['type'] = []
+# damageRatio['damageRatio'] = []
+# damageRatio['nBuildings'] = []
+# damageRatio['loss'] = []
+
+
+
+# damageState = {}
+# damageState['volcano'] = []
+# damageState['VEI'] = []
+# damageState['prob'] = []
+# damageState['type'] = []
+# damageState['damageState'] = []
+# damageState['nBuildings'] = []
+# damageState['loss'] = []
+# damageState = pd.DataFrame(damageState)
+
+# exposedRoads = {}
+# exposedRoads['volcano'] = []
+# exposedRoads['hazard'] = []
+# exposedRoads['VEI'] = []
+# exposedRoads['prob'] = []
+# exposedRoads['mass'] = []
+# exposedRoads['buffer'] = []
+# exposedRoads['volume'] = []
+# exposedRoads['roadType'] = []
+# exposedRoads['length'] = []
+# exposedRoads = pd.DataFrame(exposedRoads)
+
+damageRatio = pd.DataFrame({})
+damageState = pd.DataFrame({})
+exposure = pd.DataFrame({})
+roadExposure = pd.DataFrame({})
 
 #%% Main processing step            
 
@@ -83,6 +134,9 @@ if len(sys.argv) > 2:
     rng = range(0, volcDB.shape[0])
 else:
     rng = range(int(sys.argv[1]), int(sys.argv[1])+1)
+
+# Debug
+# rng = range(0,1)
 
 # Loop through volcanoes          
 for i in rng:
@@ -225,7 +279,8 @@ for i in rng:
     LCf = os.path.join(erup.outPath, erup.name, '_data/Landcover.tif')
     popf = os.path.join(erup.outPath, erup.name, '_data/Landscan.tif')
     roadf = os.path.join(erup.outPath, erup.name, '_data/roads.feather')
-    
+    buildWf = os.path.join(erup.outPath, erup.name, '_data/buildings_weak.tif')
+    buildSf = os.path.join(erup.outPath, erup.name, '_data/buildings_strong.tif')
     
     # If any exposure analysis is required, load the data
     if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
@@ -234,11 +289,19 @@ for i in rng:
         LC = rio.open(LCf)
         pop = rio.open(popf)
         road = gpd.read_feather(roadf)
+        buildW = rio.open(buildWf)
+        buildS = rio.open(buildSf)
         
-        # Some adjustments
+        # Read and adjust
         LC_data = LC.read(1)
         pop_data = pop.read(1)/(1000/res)**2
+        buildW_data = buildW.read(1)
+        buildS_data = buildS.read(1)
+        
+        # Adjust residuals from interpolation
         pop_data[pop_data<1] = 0
+        buildW_data[buildW_data<0] = 0
+        buildS_data[buildS_data<0] = 0
     
     if analyzeTephra:
         printy(' - Processing tephra...')
@@ -250,26 +313,38 @@ for i in rng:
                 fl = os.path.join(erup.outPath, erup.name, '_hazard/Tephra/{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(10-iP/10)))
                 # Get the road disruption
                 rnds, roadLength, rsds = getRNDS(fl, RNDS_intensity_map, road, epsg, intensity=True)
-                rsds.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/rsds{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(10-iP/10))))
+                
+                # rsds.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/rsds{}_VEI{}_P{}.csv'.format(erup.name, iVEI, int(10-iP/10))))
 
                 # In case of tephra, need to concatenate the rsds for various columns/accumulations into one. Cat, rename and drop
                 rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = rsds.RSDS_100.fillna(0)+rsds.RSDS_1.fillna(0)
                 rsds = rsds[rsds.columns.drop(list(rsds.filter(regex='RSDS')))]
                 RSDS = updateRSDS(RSDS, rsds)
                 
-                EXPOSURE = updateExposure(EXPOSURE, erup.name, 'Tephra', iVEI, iP, None, None, None, None, None, None, rnds, None)
-                
                 # Compute exposure from Landscan and landcover
                 with rio.open(fl) as haz:
                     haz_data = haz.read(1)
+                    
+                    # Update exposure
+                    # Loss from weak buildings
+                    DRw, DSw = getBuildingImpact(haz_data, buildW_data, vuln.loc[(volcDB.loc[i,'country'], 'Weak')], erup.outPath, 'weak_VEI{}_P{}.tif'.format(iVEI, int(100-iP)), erup.name, haz.profile)
+                    damageRatio, damageState = updateBuildingExposure(damageRatio,damageState,erup.name,iVEI, iP, 'weak', DRw, DSw)
+                    
+                    # Loss from strong buildings
+                    DRs, DSs = getBuildingImpact(haz_data, buildW_data, vuln.loc[(volcDB.loc[i,'country'], 'Strong')], erup.outPath, 'strong_VEI{}_P{}.tif'.format(iVEI, int(100-iP)), erup.name, haz.profile)
+                    damageRatio, damageState = updateBuildingExposure(damageRatio,damageState,erup.name,iVEI, iP, 'strong', DRs, DSs)
+                    
+                    # General exposure
+                    exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, None, None, None, None, None, None, rnds, round((DRs.loss.sum()+DRw.loss.sum())/1e6,2))
+                    
                     for iM in intT:
-                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iM)
+                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, res, iM)
                         
                         # If the value of iM is found in roadLength, then add the value of roadLength to exposure
                         if iM in roadLength.columns:
-                            EXPOSURE = updateExposure(EXPOSURE, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp, None, roadLength[[iM]])
-                        else:
-                            EXPOSURE = updateExposure(EXPOSURE, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp, None, None)
+                            roadExposure = updateRoadExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, roadLength[[iM]])
+                        
+                        exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp, None, None)
     
     if analyzeBAF:
         printy(' - Processing BAF...')
@@ -293,8 +368,9 @@ for i in rng:
                 with rio.open(fl) as haz:
                     haz_data = haz.read(1)
                     for iP in probT:
-                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                        EXPOSURE = updateExposure(EXPOSURE, erup.name, 'BAF', None, iP, None, iB, iV, popTmp, cropsTmp, urbanTmp, rnds[iP/100], roadLength[[iP/100]])
+                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, res, iP/100)
+                        exposure = updateExposure(exposure, erup.name, 'BAF', None, iP, None, iB, iV, popTmp, cropsTmp, urbanTmp, rnds[iP/100], None)
+                        roadExposure = updateRoadExposure(roadExposure, erup.name, 'BAF', None, iP, None, iB, iV, roadLength[[iP/100]])
 
     if analyzePDC:
         printy(' - Processing PDC...')
@@ -308,7 +384,7 @@ for i in rng:
             # Rename columns in rsds
             colMapName = {}
             for key, value in rnds.items():
-                colMapName['RSDS_{}'.format(key)] = 'PDC_{}m_buff_{}m3_P{}'.format(iB, iV, int(key*100))
+                colMapName['RSDS_{}'.format(key)] = 'PDC_VEI{}_P{}'.format(iVEI, int(key*100))
             rsds = rsds.rename(colMapName,axis=1)
             # Update RSDS
             RSDS = updateRSDS(RSDS, rsds)
@@ -317,8 +393,9 @@ for i in rng:
             with rio.open(fl) as haz:
                 haz_data = haz.read(1)
                 for iP in probT:
-                    popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                    EXPOSURE = updateExposure(EXPOSURE, erup.name, 'PDC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp, rnds[iP/100], roadLength[[iP/100]])
+                    popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, res, iP/100)
+                    exposure = updateExposure(exposure, erup.name, 'PDC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp, rnds[iP/100], None)
+                    roadExposure = updateRoadExposure(roadExposure, erup.name, 'PDC', iVEI, iP, None, None, None, roadLength[[iP/100]])
     
     if analyzeLC: 
         printy(' - Processing lapilli...')
@@ -329,8 +406,8 @@ for i in rng:
             with rio.open(fl) as haz:
                 haz_data = haz.read(1)
                 for iP in probT:
-                    popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, iP/100)
-                    EXPOSURE = updateExposure(EXPOSURE, erup.name, 'LC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp)
+                    popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, res, iP/100)
+                    exposure = updateExposure(exposure, erup.name, 'LC', iVEI, iP, None, None, None, popTmp, cropsTmp, urbanTmp, None, None)
 
     if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
         # Close connection to rasters
@@ -339,9 +416,100 @@ for i in rng:
         
         # Write the exposure for each volcano
         RSDS.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/RSDS.csv'))
-        EXPOSURE.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/{}.csv').format(erup.name))
+        exposure.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/exposure.csv'))
+        roadExposure.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/road_exposure.csv'))
+        damageRatio.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/damage_ratio.csv'))
+        damageState.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/damage_state.csv'))
     
     toc = time.perf_counter() # Stop counter
     print(f" Time: {toc - tic:0.0f} seconds")
 # EXPOSURE.to_csv('results.csv')
-# %%
+
+
+
+
+# %% Debug
+
+# # Prepare data
+# vuln = pd.read_csv('csv/function_params.csv')
+# vuln.columns = ['Country', 'Building_type', 'load_mean', 'load_disp', 'tot_rep_cost']
+# vuln['load_mean'] = vuln['load_mean']*101.97 # kPa to kgm-2 
+
+# # Damage state
+# dr2ds = pd.read_csv('csv/ratio_to_damage.csv')
+# dr2ds.columns = ['DS', 'DS_level ', 'cdv ', 'dr_range', 'dr_lwr', 'dr_upr']
+
+# buildWf = 'volcanoes/Cereme/_data/buildings_weak.tif'
+# fl = 'volcanoes/Cereme/_hazard/Tephra/Cereme_VEI5_P5.tif'
+
+# haz = rio.open(fl)
+# haz_data = haz.read(1)
+
+# build = rio.open(buildWf)
+# build_data = build.read(1)
+
+# iV = 0
+
+# getBuildingImpact(haz_data, build_data, vuln, outPath, flName, erup, profile)
+
+
+
+
+# # Get the damage ratio
+# f_damageRatio = lambda mn, dsp, load: scipy.stats.norm(loc = math.log(mn), scale = dsp).cdf(np.log(load))
+# haz_data[haz_data<1] = 1e-6
+# damageRatio = f_damageRatio(vuln.iloc[iV]['load_mean'], vuln.iloc[iV]['load_disp'], haz_data)
+
+# # Multiply the total by the damage ratio and by the number of buildings that were exposed to a specific tephra fall load
+# loss = damageRatio * vuln.iloc[iV]['tot_rep_cost'] * build_data
+# loss[loss<0] = 0 # Just make sure there are no negative values
+
+# # Convert damage ratio to damage state
+# damageState = np.zeros(damageRatio.shape)
+# for i in range(1,6):
+#     damageState[damageRatio>=dr2ds.iloc[i]['dr_lwr']] = i
+
+
+
+# with rio.open('test.tif', 'w', **haz.profile) as dst:
+#     dst.write(DS,1)
+    
+# # Damage ratio table
+# damageRatioR = np.round(damageRatio,1)
+
+# DR = np.round(np.linspace(0,1,11),2)
+
+# storDR = {
+#     'damageRatio': DR,
+#     'nBuildings': np.zeros(DR.shape),
+#     'loss': np.zeros(DR.shape),
+# }
+
+# storDR = pd.DataFrame(storDR)
+# storDR = storDR.set_index('damageRatio')
+
+# for iR in DR:
+#     idx = damageRatioR==iR
+#     storDR.loc[iR, 'nBuildings'] = np.sum(build_data[idx])
+#     storDR.loc[iR, 'loss'] = np.sum(loss[idx])
+    
+
+# # Damage state table
+
+# DS = np.linspace(0,5,6)
+# # DS = [int(d) for d in DS]
+
+# storDS = {
+#     'damageState': DS,
+#     'nBuildings': np.zeros(DS.shape),
+#     'loss': np.zeros(DS.shape),
+# }
+
+# storDS = pd.DataFrame(storDS)
+# storDS = storDS.set_index('damageState')
+
+# for iR in DS:
+#     idx = damageState==iR
+#     storDS.loc[iR, 'nBuildings'] = np.sum(build_data[idx])
+#     storDS.loc[iR, 'loss'] = np.sum(loss[idx])
+    

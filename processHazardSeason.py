@@ -40,26 +40,12 @@ res = 90
 
 # Steps selection
 processTephra = False
-processBAF = False
-processPDC = False
-processLC = False
-
-processLandCover = False
-processLandScan = False 
-processRoadNetwork = False
-processBuildings = False
-
 analyzeTephra = True
-analyzeBAF = True
-analyzePDC = True
-analyzeLC = True
 
 # Main loops for processing
 VEI = [3,4,5]
 probT = [10,50,90]
 intT = [1,5,50,100]
-buffT = ['300', '990']
-volT = ['9800000', '450000']
 
 # Dictionaries for road disruption
 RNDS_intensity_map = {1: 10,

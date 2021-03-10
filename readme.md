@@ -14,6 +14,7 @@ Then:
 conda install geopandas
 conda install -c conda-forge pyarrow
 conda install -c conda-forge rasterio
+conda install contextily
 conda install osmnx
 ```
 
@@ -156,6 +157,25 @@ pop.close()
 
 ```python
 erup.getLandcover()
+```
+
+
+## Tips
+
+### Plotting geopandas basemaps with contextily
+
+It is possible to plot basemaps to geopandas with [contextily](https://contextily.readthedocs.io). Data needs to be in Web Mercator `EPSG:3875`:
+
+```python
+ax = erup.areaG.to_crs('EPSG:3857').plot(alpha=0.5)
+ctx.add_basemap(ax)
+```
+
+Alternatively, it is possible to re-project the basemap to `EPSG:4326`:
+
+```python
+ax = erup.areaG.plot(alpha=0.5)
+ctx.add_basemap(ax, crs=erup.areaG.crs.to_string())
 ```
 
 ## Change log

@@ -1,7 +1,7 @@
 #%%
 import os
 import sys
-os.chdir('/Users/seb/Documents/Codes/VolcGIS')
+# os.chdir('/Users/seb/Documents/Codes/VolcGIS')
 import volcgis 
 from volcgis.exposureAnalysis import *
 from rasterio.plot import show
@@ -39,7 +39,7 @@ vuln = vuln.set_index(['Country', 'Building_type'])
 res = 90
 
 # Steps selection
-processTephra = False
+processTephra = True
 processBAF = False
 processPDC = False
 processLC = False
@@ -49,10 +49,10 @@ processLandScan = False
 processRoadNetwork = False
 processBuildings = False
 
-analyzeTephra = True
-analyzeBAF = True
-analyzePDC = True
-analyzeLC = True
+analyzeTephra = False
+analyzeBAF = False
+analyzePDC = False
+analyzeLC = False
 
 # Main loops for processing
 VEI = [3,4,5]
@@ -68,60 +68,8 @@ RNDS_intensity_map = {1: 10,
 RNDS_probability_map = {0.1: 100,
                     0.5: 100,
                     0.9: 100}
+
 # Exposure storage
-# exposure = {}
-# exposure['volcano'] = []
-# exposure['hazard'] = []
-# exposure['VEI'] = []
-# exposure['prob'] = []
-# exposure['mass'] = []
-# exposure['buffer'] = []
-# exposure['volume'] = []
-# exposure['pop_count'] = []
-# exposure['area_crops'] = []
-# exposure['area_urban'] = []
-# exposure['RNDS'] = []
-# exposure['cost_total'] = []
-# exposure['cost_weak'] = []
-# exposure['cost_strong'] = []
-# exposure['n_weak'] = []
-# exposure['n_strong'] = []
-# EXPOSURE = pd.DataFrame(exposure)
-
-
-# damageRatio = {}
-# damageRatio['volcano'] = []
-# damageRatio['VEI'] = []
-# damageRatio['prob'] = []
-# damageRatio['type'] = []
-# damageRatio['damageRatio'] = []
-# damageRatio['nBuildings'] = []
-# damageRatio['loss'] = []
-
-
-
-# damageState = {}
-# damageState['volcano'] = []
-# damageState['VEI'] = []
-# damageState['prob'] = []
-# damageState['type'] = []
-# damageState['damageState'] = []
-# damageState['nBuildings'] = []
-# damageState['loss'] = []
-# damageState = pd.DataFrame(damageState)
-
-# exposedRoads = {}
-# exposedRoads['volcano'] = []
-# exposedRoads['hazard'] = []
-# exposedRoads['VEI'] = []
-# exposedRoads['prob'] = []
-# exposedRoads['mass'] = []
-# exposedRoads['buffer'] = []
-# exposedRoads['volume'] = []
-# exposedRoads['roadType'] = []
-# exposedRoads['length'] = []
-# exposedRoads = pd.DataFrame(exposedRoads)
-
 damageRatio = pd.DataFrame({})
 damageState = pd.DataFrame({})
 exposure = pd.DataFrame({})
@@ -130,7 +78,7 @@ roadExposure = pd.DataFrame({})
 #%% Main processing step            
 
 # Handling if the function is called from the command line                          
-if len(sys.argv) > 2:
+if (len(sys.argv)==1) or (len(sys.argv) > 2):
     rng = range(0, volcDB.shape[0])
 else:
     rng = range(int(sys.argv[1]), int(sys.argv[1])+1)
@@ -182,7 +130,7 @@ for i in rng:
         nameConstructor = {
             'volcano':    [name],
             'VEI':        ['VEI3', 'VEI4', 'VEI5'],
-            'perc':       ['P1', 'P5', 'P9'],
+            'perc':       ['P10', 'P50', 'P90'],
             'format':     ['.tif']
         }
 
@@ -310,11 +258,9 @@ for i in rng:
                 printy('   - VEI: {} - Prob: {}...'.format(iVEI, iP))
                 
                 # Define hazard file
-                fl = os.path.join(erup.outPath, erup.name, '_hazard/Tephra/{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(10-iP/10)))
+                fl = os.path.join(erup.outPath, erup.name, '_hazard/Tephra/{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(100-iP)))
                 # Get the road disruption
                 rnds, roadLength, rsds = getRNDS(fl, RNDS_intensity_map, road, epsg, intensity=True)
-                
-                # rsds.to_csv(os.path.join(erup.outPath, erup.name, '_exposure/rsds{}_VEI{}_P{}.csv'.format(erup.name, iVEI, int(10-iP/10))))
 
                 # In case of tephra, need to concatenate the rsds for various columns/accumulations into one. Cat, rename and drop
                 rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = rsds.RSDS_100.fillna(0)+rsds.RSDS_1.fillna(0)

@@ -10,12 +10,12 @@ from pyproj import Transformer
 import numpy as np
 import scipy.stats
 import math
-import utm
-from printy import printy
+# import utm
+# from printy import printy
 import fiona
 import geopandas as gpd
 from shapely.geometry import shape
-from alive_progress import alive_bar
+# from alive_progress import alive_bar
 import time
 
 def updateRSDS(RSDS, rsds):
@@ -144,7 +144,8 @@ def getRNDS(hazardPath, dictMap, road, epsg, intensity):
     Arguments:
         hazardPath (str): Path to hazard file
         dictMap (dict): 
-        road (feather): path location for the pre-processed study are road file
+        road (gpd): 
+        epsg (int): Digits of the epsg code
         intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)
 
     Returns:
@@ -238,8 +239,10 @@ def getBuildingImpact(haz_data, build_data, vuln, outPath, flName, erup, profile
     Physical impact on buildings from tephra fallout
     
     Args:
-        vuln (pd.Series): Must contain the following fields: load_mean, load_disp, tot_rep_cost
+        vuln (pd.Series): CSV file containing the parameters of the fragility curves. Must contain the following fields: 
+            load_mean, load_disp, tot_rep_cost
         outPth (str): Main output directory
+        flName (str): String appended to the raster names. If ``None``, no raster is written
         erup (str): Volcano name
         profile (dict): Rasterio reference profile for writing output
     """
@@ -263,14 +266,15 @@ def getBuildingImpact(haz_data, build_data, vuln, outPath, flName, erup, profile
         damageState[damageRatio>=dr2ds.iloc[i]['dr_upr']] = i
     
     ## Write the rasters 
+    if flName is not None:
     # Write damage ratio as raster
-    with rio.open(os.path.join(outPath, erup, '_exposure/damageRatio_{}'.format(flName)), 'w', **profile) as dst:
-        dst.write(damageRatio,1)
-    
-    # Write loss as raster
-    with rio.open(os.path.join(outPath, erup, '_exposure/loss_{}'.format(flName)), 'w', **profile) as dst:
-        dst.write(loss,1)
+        with rio.open(os.path.join(outPath, erup, '_exposure/damageRatio_{}'.format(flName)), 'w', **profile) as dst:
+            dst.write(damageRatio,1)
         
+        # Write loss as raster
+        with rio.open(os.path.join(outPath, erup, '_exposure/loss_{}'.format(flName)), 'w', **profile) as dst:
+            dst.write(loss,1)
+            
     ## Write the tiffs
     # Damage ratio table
     damageRatioR = np.round(damageRatio,1)

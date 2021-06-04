@@ -10,12 +10,13 @@ import pandas as pd
 from pyproj import CRS
 from pyproj import Transformer
 import numpy as np
-import utm
-from printy import printy
-import fiona
+# import utm
+# from printy import printy
+# import fiona
 import geopandas as gpd
 from shapely.geometry import shape
 # from alive_progress import alive_bar
+import contextily as ctx
 import time
 
 # Tephra thresholds
@@ -50,9 +51,9 @@ processRoadNetwork = False
 processBuildings = False
 
 analyzeTephra = True
-analyzeBAF = True
-analyzePDC = True
-analyzeLC = True
+analyzeBAF = False
+analyzePDC = False
+analyzeLC = False
 
 # Main loops for processing
 VEI = [3,4,5]
@@ -89,7 +90,7 @@ else:
 # Loop through volcanoes          
 for i in rng:
     tic = time.perf_counter() # Start counter
-    printy(volcDB.loc[i, 'name'].upper(), 'cB')
+    print(volcDB.loc[i, 'name'].upper())
     lat = volcDB.loc[i, 'lat']
     lon = volcDB.loc[i, 'lon']
     name = volcDB.loc[i, 'name']
@@ -118,7 +119,7 @@ for i in rng:
         'extent':   [volcDB.loc[i, 'xmin'], volcDB.loc[i, 'xmax'], volcDB.loc[i, 'ymin'], volcDB.loc[i, 'ymax']], # extent around vent in meters, [minx maxx miny maxy]
         'epsg':     epsg
     }
-
+ 
     # Define the eruption
     erup = volcgis.eruption(eruption, res)
 
@@ -261,7 +262,7 @@ for i in rng:
                 fl = os.path.join(erup.outPath, erup.name, '_hazard/Tephra/{}_VEI{}_P{}.tif'.format(erup.name, iVEI, int(100-iP)))
                 # Get the road disruption
                 rnds, roadLength, rsds = getRNDS(fl, RNDS_intensity_map, road, epsg, intensity=True)
-
+                
                 # In case of tephra, need to concatenate the rsds for various columns/accumulations into one. Cat, rename and drop
                 
                 # Test to handle problems on Gekko
@@ -295,8 +296,8 @@ for i in rng:
                         
                         # If the value of iM is found in roadLength, then add the value of roadLength to exposure
                         if iM in roadLength.columns:
-                            roadExposure = updateRoadExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, roadLength[[iM]])
-                        
+                            roadExposure = updateRoadExposure(roadExposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, roadLength[[iM]])
+                            breakpoint()
                         exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, popTmp, cropsTmp, urbanTmp, None, None)
     
     if analyzeBAF:

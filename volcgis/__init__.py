@@ -27,7 +27,7 @@ import shapely
 
 import os
 import json
-os.chdir('/Users/seb/Documents/Codes/VolcGIS')
+# os.chdir('/Users/seb/Documents/Codes/VolcGIS')
 
 # Note:
 # `Backup__init__.py`: Backup of the library. There might still be some good ideas in there though a lot were simplified
@@ -42,7 +42,6 @@ class eruption:
             masterRes (int): Cell size (m)
             outPath (str): Master folder for output path. If None, default is './volcanoes'
         '''
-        
 
         self.outPath = 'volcanoes' if outPath == None else outPath
         
@@ -74,22 +73,6 @@ class eruption:
         self.vent = {'lat': eruption['vent'][0], 'lon': eruption['vent'][1], 'easting': round(xtmp), 'northing': round(ytmp), 'alt': eruption['vent'][2]}
 
         # Create area mask
-        # if eruption['extent'][0]<0:
-        #     xmin = round(xtmp)+abs(eruption['extent'][0])
-        # else:
-        #     xmin = round(xtmp)-eruption['extent'][0]
-            
-        # if eruption['extent'][0]<0:
-        #     xmax = round(xtmp)+abs(eruption['extent'][1])
-        # else:
-        #     xmax = round(xtmp)-eruption['extent'][1]
-            
-            
-        # areaPl = box(xmin, 
-        #              round(ytmp)-eruption['extent'][2],
-        #              xmax,
-        #              round(ytmp)+eruption['extent'][3])
-        
         areaPl = box(eruption['extent'][0], 
                      eruption['extent'][2],
                      eruption['extent'][1],
@@ -100,6 +83,18 @@ class eruption:
         self.area = gpd.GeoDataFrame({'geometry': areaPl}, index=[0], crs=self.EPSG_proj) # Area is now projected
         self.areaG = self.area.to_crs(from_epsg(4326)) # Project it
 
+        # Define buffers
+        tmp = pd.DataFrame(self.vent, index=[0])
+        gdf = gpd.GeoDataFrame(tmp, geometry=gpd.points_from_xy(tmp.easting, tmp.northing), crs=self.EPSG_proj)
+        
+        buffer = pd.DataFrame()
+        for iB in [10,30,100]:
+            buffer = buffer.append(gdf.geometry.buffer(iB*1e3).rename(iB))
+        print(buffer)
+        buffer.columns = ['geometry']
+        self.buffer = buffer
+        
+    
         # Define reference for virtual wrap on which all rasters will be aligned
         self.ref = {}
         self.ref['bounds'] = self.area.geometry[0].bounds
@@ -239,7 +234,7 @@ class eruption:
         if resampling == 'nearest':
             vrt_options['resampling'] = Resampling.nearest
 
-        with rio.open(inPath, 'r+') as src:
+        with rio.open(inPath, 'r') as src:
             # In case no EPSG is specified (e.g. asc)
             if src.crs == None:
                 #  src.crs = 'EPSG:{}'.format(epsg)

@@ -10,6 +10,7 @@ from matplotlib import gridspec
 #region preproces
 print('Read master exposure')
 data = pd.read_csv('MASTER_exposure.csv', index_col=None).drop('Unnamed: 0', axis=1)
+buffer = pd.read_csv('MASTER_buffer.csv', index_col=None)
 
 # Read volcano index with country names
 volcDB = pd.read_csv('csv/volcCoordinates.csv')
@@ -26,6 +27,9 @@ def mergeData(data, db):
 data = mergeData(data, volcDB)
 data = data.set_index(['hazard', 'VEI', 'prob'])
 
+buffer = mergeData(buffer, volcDB)
+buffer = buffer.set_index('buffer')
+
 # Format string
 data['volcano'] = data['volcano'].str.replace('_',' ')
 data['volcano'] = data['volcano'].str.replace('Leroboleng','Lereboleng')
@@ -40,7 +44,7 @@ CMAPb = [['#fdbe85','#fd8d3c','#e6550d'], ['#78c679','#31a354','#006837']]
 CMAPm = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99','#b15928']
 # Options
 plotLog = True
-plotCI = True 
+plotCI = False 
 plotOutline = False
 
 #endregion
@@ -60,7 +64,7 @@ tephra = tephra.loc[tephra.month == 0]
 
 fig, axes = plt.subplots(nrows=len(expName), ncols=len(regionsRatio), sharey='row',
                                gridspec_kw={'width_ratios': regionsRatio},
-                               figsize=(10,7.5))
+                               figsize=(10,15))
 
 for iRow in range(0, len(expName)):
     
@@ -112,6 +116,71 @@ sns.despine()
 plt.tight_layout()
 fig.subplots_adjust(wspace=.25,hspace=.25)
 fig.suptitle('Exposure to tephra accumulation ($P=50\%$)', y=1.02, fontweight='bold')
+for ax in fig.axes:
+    # ax.tick_params(labelrotation=45)
+    if plotLog:
+        ax.set_yscale("log") 
+    ax.set_xlabel(None)
+    if plotOutline:
+        plt.setp(ax.patches, linewidth=0)
+    
+#endregion
+
+# %% Buffer
+# region Buffer
+print('Buffer exposure')
+# Exposure
+expCol = ['pop_count']
+expName = ['Population count']
+
+
+# tephra = data.loc['Tephra', :, 50]
+
+fig, axes = plt.subplots(nrows=len(expName), ncols=len(regionsRatio), sharey='row',
+                               gridspec_kw={'width_ratios': regionsRatio},
+                               figsize=(10,4))
+
+for iRow in range(0, len(expName)):
+
+    for iCol in range(0, len(regionsRatio)):
+        # Colormap
+        if iCol == len(regionsRatio)-1:
+            cmap = CMAP[1] # Purples
+            cmapb = CMAPb[1] # Purples
+        else:
+            cmap = CMAP[0]
+            cmapb = CMAPb[0]
+            
+        # Datacol
+        dataCol = buffer[buffer.region==regions[iCol]]
+        dataCol = dataCol.sort_index()
+            
+        # Plot
+        vCount = 0
+        for iV in [100,30,10]:
+            sns.barplot(ax=axes[iCol], x='volcano', y=expCol[iRow], data = dataCol.loc[iV], label=f'Buffer: {iV}', color=cmap[vCount], ci=None)
+            vCount += 1
+
+        # Control y label
+        if iCol == 0:
+            axes[iCol].set(ylabel=expName[iRow])
+        else:
+            axes[iCol].set(ylabel=None)  
+        
+        # Control x label
+        if iRow == len(expName)-1:
+            axes[iCol].set_xticklabels(dataCol.volcano.unique(), rotation=90)#, ha='right')
+        else:
+            axes[iCol].set_xticklabels([])
+        
+        # Control column title
+        if iRow == 0:
+            axes[iCol].set_title(regions[iCol])
+
+sns.despine()
+plt.tight_layout()
+fig.subplots_adjust(wspace=.25,hspace=.25)
+fig.suptitle('Exposure as circular buffers', y=1.02, fontweight='bold')
 for ax in fig.axes:
     # ax.tick_params(labelrotation=45)
     if plotLog:

@@ -17,6 +17,11 @@ import geopandas as gpd
 from shapely.geometry import shape
 # from alive_progress import alive_bar
 import time
+import json
+
+def getFeatures(gdf):
+    """Function to parse features from GeoDataFrame in such a manner that rasterio wants them"""
+    return [json.loads(gdf.to_json())['features'][0]['geometry']]
 
 def updateRSDS(RSDS, rsds):
     """
@@ -120,6 +125,26 @@ def updateBuildingExposure(damageRatio, damageState, volcano, VEI, prob, typ, DR
     return damageRatio.append(DR), damageState.append(DS)
 
 def getExposure(haz_data, pop_data, LC_data, res, val):
+    """ Get exposure 
+    
+    """
+    
+    # Get hazard index
+    idx = haz_data >= val
+    # Population
+    popTmp = np.sum(pop_data[idx])
+
+    # Landcover / crops km2
+    idx = (haz_data >= val) & (LC_data==40)
+    cropsTmp = np.sum(idx)*res**2/1e6
+    
+    # Landcover / urban km2
+    idx = (haz_data >= val) & (LC_data==50)
+    urbanTmp = np.sum(idx)*res**2/1e6
+
+    return round(popTmp,0), round(cropsTmp,0), round(urbanTmp,0)
+
+def getBufferExposure(buffer, fl):
     """ Get exposure 
     
     """

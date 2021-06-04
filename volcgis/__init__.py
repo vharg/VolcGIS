@@ -90,7 +90,6 @@ class eruption:
         buffer = pd.DataFrame()
         for iB in [10,30,100]:
             buffer = buffer.append(gdf.geometry.buffer(iB*1e3).rename(iB))
-        print(buffer)
         buffer.columns = ['geometry']
         self.buffer = buffer
         

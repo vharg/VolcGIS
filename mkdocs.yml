@@ -1,0 +1,25 @@
+site_name: volcGIS
+site_url: https://example.com/
+
+theme:
+  name: material
+  # features:
+  #     - navigation.tabs
+  #     - navigation.sections
+  #     - navigation.expand
+  icon:
+      repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting started:
+    - Install: install.md
+    - Basic commands: basic.md
+    - Tips: tips.md
+    - Changelog: changelog.md
+  - volcGIS API:
+    - Module eruption: volcGIS_eruption.md
+
+plugins:
+    - search
+    - mkdocstrings

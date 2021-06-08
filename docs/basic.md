@@ -1,42 +1,9 @@
+# Getting started
 
-## Install
-
-Create environment and set the channel to `conda-forge`:
-
-```
-
-conda config --env --add channels conda-forge
-conda config --env --set channel_priority strict
-```
-
-Then:
-
-```
-conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh contextily osmnx
-conda install -c conda-forge holoviews datashader panel param geoviews
-```
-
-Install these packages with `pip`:
-
-```
-pip install utm
-pip install alive-progress
-```
-
-To install the documentation:
-
-```
-pip install mkdocs-material
-```
-
-### Content
-
-- `csv/`: Root of csv files
-- `plottingApp`: Bokeh function used on WOVODAT
-
-## Basic commands 
+## Basic commands
 
 ### Import
+
 ```python
 import volcgis
 ```
@@ -55,6 +22,7 @@ eruption = {
 ```
 
 Where:
+
 - `name`: eruption/volcano name (str)
 - `vent`: geographic coordinates of the vent defined as [`lat`, `lon`, `alt`], where:
   - `lat`: Latitude in decimal degrees (WGS84, negative in S hemisphere)
@@ -62,9 +30,9 @@ Where:
   - `alt`: Vent elevation (m asl)
 - `extent`: Extent of the reference region, defined as [`dxMin`, `dxMax`, `dyMin`, `dyMax`]:
   - `dxMin`: Distance (m) from the vent in the W direction
-  - `dxMax`: Distance (m) from the vent in the E direction 
-  - `dyMin`: Distance (m) from the vent in the S direction 
-  - `dyMax`: Distance (m) from the vent in the N direction 
+  - `dxMax`: Distance (m) from the vent in the E direction
+  - `dyMin`: Distance (m) from the vent in the S direction
+  - `dyMax`: Distance (m) from the vent in the N direction
 - `epsg`: Digits of the projection to use (e.g. )
 
 An eruption is then defined as:
@@ -74,6 +42,7 @@ erup = volcgis.eruption(eruption, res)
 ```
 
 Where:
+
 - `res` is the reference resolution (m)
 
 ### Defining and pre-processing a hazard type
@@ -115,6 +84,7 @@ tephra = {
 ```
 
 Where:
+
 - `hazard`: Type of hazard (arbitrary but needs to be consistent)
 - `epsg`: Digits of the coordinate system of the hazard model output
 - `rootDir`: Location of the hazard model output files
@@ -129,6 +99,7 @@ erup.prepareHazard(tephra)
 ```
 
 Essentially, this step:
+
 1. Read each file found by `nameConstructor` in the `rootDir` folder
 2. Use a virtual wrapper to **reproject** the hazard file to `erup.epsg`, **clip** the extent and **aling** pixels to the extent defined by `erup.area`
 3. Saves the file in `volcanoes/___volcanoName/_hazard/___hazardName/`, where:
@@ -136,6 +107,7 @@ Essentially, this step:
     - `___hazardName` is `hazard.hazard`
 
 ### Retrieving exposure data
+
 Reproject, crop and align extent based on `erup.area`/`erup.epsg` and saves subset in `volcanoes/___volcanoName/_data/`. In all cases, a custom path to the source dataset can be specified with the named keyword argument `inPth`.
 
 #### Landscan
@@ -164,73 +136,3 @@ pop.close()
 ```python
 erup.getLandcover()
 ```
-
-
-## Tips
-
-### Plotting geopandas basemaps with contextily
-
-It is possible to plot basemaps to geopandas with [contextily](https://contextily.readthedocs.io). Data needs to be in Web Mercator `EPSG:3875`:
-
-```python
-import contextily as ctx
-fig = plt.figure(figsize=[8,10])
-ax = fig.add_subplot(1, 1, 1)
-ax = erup.areaG.to_crs('EPSG:3857').plot(alpha=0.5,ax=ax)
-ctx.add_basemap(ax)
-```
-
-Alternatively, it is possible to re-project the basemap to `EPSG:4326`:
-
-```python
-ax = erup.areaG.plot(alpha=0.5)
-ctx.add_basemap(ax, crs=erup.areaG.crs.to_string())
-```
-
-### Join the RSDS data to the original .feather file
-
-```python
-import geopandas as gpd
-
-name = 'Taal'
-
-roadf = os.path.join('volcanoes', name, '_data/roads.feather')
-road = gpd.read_feather(roadf)
-road['Road_ID'] = road['Road_ID'].astype(int) # Make sure the ID is in the same type
-road = road.set_index('Road_ID')
-
-rsdsf = os.path.join('volcanoes', name, '_exposure/RSDS.csv')
-rsds = pd.read_csv(rsdsf)
-rsds = rsds.set_index('Road_ID')
-
-ROAD = road.join(rsds)
-ROAD = ROAD.fillna(0)
-```
-
-### Starting the plotting app on Wovodat
-
-Start the bokeh plotting app in `exposure.py`, making it available at [gee.wovodat.org/exposure](gee.wovodat.org/exposure)
-
-```bash
-conda activate ee
-nohup bokeh serve --allow-websocket-origin='*' exposure.py --log-level=debug
-```
-
-## Change log
-
-### 2021-03-04
-
-- Moved all exposure analysis functions to `volcgis.exposureAnalysis`
-
-#### Road Exposure
-Updated road exposure from Josh's commit. Namely:
-- Removed `ROAD_EXPOSURE` variable and added content to `EXPOSURE`
-- Remove `updateRoads` and added to `updateExposure`
-
-#### `getRNDS`
-- `getRNDS` now returns three arguments, including `roadLength` and `RSDS`
-- `roadLength` is added to `EXPOSURE`
-- `RSDS` is a pd.DataFrame that contains `RSDS` value for each road segment defined by `Road_ID`. Each column is a different hazard occurrence (i.e. hazard type, VEI, prob etc)
-
-#### `Gekko`
-- Prepared `processHazard.py` for parallel processing on Gekko using Job Arrays

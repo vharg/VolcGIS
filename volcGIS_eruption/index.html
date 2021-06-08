@@ -1,0 +1,1583 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://example.com/volcGIS_eruption/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2, mkdocs-material-7.1.7">
+    
+    
+      
+        <title>Module eruption - volcGIS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#volcgis" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="volcGIS" class="md-header__button md-logo" aria-label="volcGIS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            volcGIS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Module eruption
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/vharg/VolcGIS/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vharg/VolcGIS
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="volcGIS" class="md-nav__button md-logo" aria-label="volcGIS" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    volcGIS
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/vharg/VolcGIS/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vharg/VolcGIS
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      <label class="md-nav__link" for="__nav_2">
+        Getting started
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Getting started" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Getting started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        Install
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic/" class="md-nav__link">
+        Basic commands
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        volcGIS API
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="volcGIS API" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          volcGIS API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Module eruption
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Module eruption
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption" class="md-nav__link">
+    volcgis.eruption
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption" class="md-nav__link">
+    eruption
+  </a>
+  
+    <nav class="md-nav" aria-label="eruption">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.alignRaster" class="md-nav__link">
+    alignRaster()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getBuildingExposure" class="md-nav__link">
+    getBuildingExposure()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getLandcover" class="md-nav__link">
+    getLandcover()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getLandscan" class="md-nav__link">
+    getLandscan()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getRoadNetwork" class="md-nav__link">
+    getRoadNetwork()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.makeInputFileName" class="md-nav__link">
+    makeInputFileName()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.prepareHazard" class="md-nav__link">
+    prepareHazard()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.makeZoneBoundaries" class="md-nav__link">
+    makeZoneBoundaries()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.parseDistanceMatrix" class="md-nav__link">
+    parseDistanceMatrix()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../volcGIS_exposureAnalysis/" class="md-nav__link">
+        Module exposureAnalysis
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption" class="md-nav__link">
+    volcgis.eruption
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption" class="md-nav__link">
+    eruption
+  </a>
+  
+    <nav class="md-nav" aria-label="eruption">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.alignRaster" class="md-nav__link">
+    alignRaster()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getBuildingExposure" class="md-nav__link">
+    getBuildingExposure()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getLandcover" class="md-nav__link">
+    getLandcover()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getLandscan" class="md-nav__link">
+    getLandscan()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.getRoadNetwork" class="md-nav__link">
+    getRoadNetwork()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.makeInputFileName" class="md-nav__link">
+    makeInputFileName()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.prepareHazard" class="md-nav__link">
+    prepareHazard()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.makeZoneBoundaries" class="md-nav__link">
+    makeZoneBoundaries()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.parseDistanceMatrix" class="md-nav__link">
+    parseDistanceMatrix()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/vharg/VolcGIS/edit/master/docs/volcGIS_eruption.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="volcgis">volcGIS</h1>
+<p>Main module to:</p>
+<ul>
+<li>Setup eruptions</li>
+<li>Pre-process hazard data</li>
+<li>Pre-process exposure data</li>
+</ul>
+
+
+  <div class="doc doc-object doc-module">
+
+<a id="volcgis.eruption"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="volcgis.eruption.eruption" class="doc doc-heading">
+        <code>eruption</code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eruption</span><span class="p">,</span> <span class="n">masterRes</span><span class="p">,</span> <span class="n">outPath</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Sets main eruption object.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>eruption</code></td>
+        <td><code>dict</code></td>
+        <td><p>Eruption dictionary</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>masterRes</code></td>
+        <td><code>int</code></td>
+        <td><p>Cell size (m)</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>outPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Master folder for output path. If None, default is './volcanoes'</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eruption</span><span class="p">,</span> <span class="n">masterRes</span><span class="p">,</span> <span class="n">outPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Sets main eruption object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        eruption (dict): Eruption dictionary</span>
+<span class="sd">        masterRes (int): Cell size (m)</span>
+<span class="sd">        outPath (str): Master folder for output path. If None, default is &#39;./volcanoes&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">outPath</span> <span class="o">=</span> <span class="s1">&#39;volcanoes&#39;</span> <span class="k">if</span> <span class="n">outPath</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">outPath</span>
+
+    <span class="c1"># Set default variables</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="n">masterRes</span>
+
+    <span class="c1"># Set path and folders</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_tmp&#39;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_hazard&#39;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_exposure&#39;</span><span class="p">))</span>
+
+    <span class="c1"># Define projections</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span> <span class="o">=</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;epsg&#39;</span><span class="p">]</span>
+    <span class="c1"># self.EPSG_geo = pyproj.CRS(&#39;EPSG:{}&#39;.format(4326))</span>
+    <span class="c1"># self.EPSG_proj = pyproj.CRS(&#39;EPSG:{}&#39;.format(self.EPSG))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">EPSG_geo</span> <span class="o">=</span> <span class="s1">&#39;epsg:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span> <span class="o">=</span> <span class="s1">&#39;epsg:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">)</span>
+
+    <span class="c1"># Convert vent into a geometry</span>
+    <span class="c1"># xtmp, ytmp = pyproj.Transform.transform(self.EPSG_geo, self.EPSG_proj, eruption[&#39;vent&#39;][0], eruption[&#39;vent&#39;][1])</span>
+    <span class="c1"># self.vent = {&#39;lat&#39;: eruption[&#39;vent&#39;][0], &#39;lon&#39;: eruption[&#39;vent&#39;][1], &#39;easting&#39;: round(xtmp), &#39;northing&#39;: round(ytmp), &#39;alt&#39;: eruption[&#39;vent&#39;][2]}</span>
+    <span class="c1"># Update Pyproj2</span>
+    <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_geo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">xtmp</span><span class="p">,</span> <span class="n">ytmp</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;vent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;vent&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">vent</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;vent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;vent&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;easting&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">xtmp</span><span class="p">),</span> <span class="s1">&#39;northing&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">ytmp</span><span class="p">),</span> <span class="s1">&#39;alt&#39;</span><span class="p">:</span> <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;vent&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]}</span>
+
+    <span class="c1"># Create area mask</span>
+    <span class="n">areaPl</span> <span class="o">=</span> <span class="n">box</span><span class="p">(</span><span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
+                 <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                 <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                 <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="c1"># dxMin, dxMax, dyMin, dyMax = volcgis.makeZoneBoundaries(xtmp, ytmp, </span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">areaPl</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span> <span class="c1"># Area is now projected</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">areaG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">4326</span><span class="p">))</span> <span class="c1"># Project it</span>
+
+    <span class="c1"># Define buffers</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vent</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">easting</span><span class="p">,</span> <span class="n">tmp</span><span class="o">.</span><span class="n">northing</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span>
+
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">iB</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">100</span><span class="p">]:</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">iB</span><span class="o">*</span><span class="mf">1e3</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">iB</span><span class="p">))</span>
+    <span class="n">buffer</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">buffer</span>
+
+
+    <span class="c1"># Define reference for virtual wrap on which all rasters will be aligned</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">affine</span><span class="o">.</span><span class="n">Affine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;EPSG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.alignRaster" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">scalingFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Aligns raster to a reference grid using a virtual wrap. Use reference contained in self.ref to read a window of original file and wrap it</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>inPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to input raster</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>outPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to output raster</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>resampling</code></td>
+        <td><code>str</code></td>
+        <td><p>Resampling method</p></td>
+        <td><code>&#39;cubic&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>scalingFactor</code></td>
+        <td><code>float</code></td>
+        <td></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>image</code></td>
+      <td><p>A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">,</span> <span class="n">scalingFactor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aligns raster to a reference grid using a virtual wrap. Use reference contained in self.ref to read a window of original file and wrap it</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inPath (str): Path to input raster</span>
+<span class="sd">            outPath (str): Path to output raster</span>
+<span class="sd">            resampling (str): Resampling method</span>
+<span class="sd">            scalingFactor (float):</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            image: A geotif cropped, aligned and projected to `self.ref[&#39;bounds&#39;]`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Virtual wrapper options</span>
+    <span class="n">vrt_options</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;resampling&#39;</span><span class="p">:</span> <span class="n">Resampling</span><span class="o">.</span><span class="n">cubic</span><span class="p">,</span>
+        <span class="s1">&#39;crs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;EPSG&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;transform&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;GTiff&#39;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">resampling</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">:</span>
+        <span class="n">vrt_options</span><span class="p">[</span><span class="s1">&#39;resampling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Resampling</span><span class="o">.</span><span class="n">nearest</span>
+
+    <span class="k">with</span> <span class="n">rio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="c1"># In case no EPSG is specified (e.g. asc)</span>
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">#  src.crs = &#39;EPSG:{}&#39;.format(epsg)</span>
+             <span class="n">src</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_epsg</span><span class="p">(</span><span class="n">epsg</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">WarpedVRT</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="o">**</span><span class="n">vrt_options</span><span class="p">)</span> <span class="k">as</span> <span class="n">vrt</span><span class="p">:</span>
+            <span class="n">rst</span> <span class="o">=</span> <span class="n">vrt</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]))</span>
+            <span class="c1"># rst = vrt.read(1, window=from_bounds(self.ref[&#39;bounds&#39;][0], self.ref[&#39;bounds&#39;][1], self.ref[&#39;bounds&#39;][2], self.ref[&#39;bounds&#39;][3], src.transform))</span>
+
+            <span class="n">rio_shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">vrt</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s1">&#39;lzw&#39;</span><span class="p">)</span>
+
+    <span class="c1"># if scalingFactor is not None:</span>
+    <span class="c1">#     with rio.open(outPath, &#39;w&#39;, **profile) as src:</span>
+    <span class="c1">#         data = np.round(src.read(1)/(scalingFactor**2))</span>
+    <span class="c1">#         src.write(data.astype(rio.int32))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.getBuildingExposure" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">getBuildingExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outPath</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Retrieves building exposure from George's analysis for area defined by self.area.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>inPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to corresponding raster</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>      <p>!!! returns
+     image: A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBuildingExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Retrieves building exposure from George&#39;s analysis for area defined by self.area.</span>
+
+<span class="sd">   Args:</span>
+<span class="sd">        inPath (str): Path to corresponding raster</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image: A geotif cropped, aligned and projected to `self.ref[&#39;bounds&#39;]`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="c1"># if inPath is None:</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.getLandcover" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">getLandcover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>inPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to corresponding raster</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>      <p>!!! returns
+     image: A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p>
+
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getLandcover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Retrieves Landcover data for the area defined by self.area. Resampling is set to &#39;nearest&#39; for discrete data</span>
+
+<span class="sd">   Args:</span>
+<span class="sd">        inPath (str): Path to corresponding raster</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image: A geotif cropped, aligned and projected to `self.ref[&#39;bounds&#39;]`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inPath</span> <span class="o">=</span> <span class="s1">&#39;DATA/LC100_2018_croped.tif&#39;</span>
+
+    <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;Landcover.tif&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.getLandscan" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">getLandscan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Retrieves Landscan data for the area defined by self.area.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>inPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to corresponding raster</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>image</code></td>
+      <td><p>A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getLandscan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Retrieves Landscan data for the area defined by self.area.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inPath (str): Path to corresponding raster</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image: A geotif cropped, aligned and projected to `self.ref[&#39;bounds&#39;]`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inPath</span> <span class="o">=</span> <span class="s1">&#39;DATA/Landscan.tif&#39;</span>
+
+    <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;Landscan.tif&#39;</span><span class="p">)</span>
+
+    <span class="n">originalRes</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># Landscan resolution</span>
+    <span class="n">scaling</span> <span class="o">=</span> <span class="n">originalRes</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="c1"># Scaling factor to correct population</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">resampling</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">scalingFactor</span><span class="o">=</span><span class="n">scaling</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.getRoadNetwork" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">getRoadNetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>inPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to the main roads dataset</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>roads (feather)</code></td>
+      <td><p>A feather file of the roads within BBox</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getRoadNetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inPath (str): Path to the main roads dataset</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        roads (feather): A feather file of the roads within BBox</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Re-project self.areaG to pseudo mercator 3857</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">3857</span><span class="p">))</span>
+
+    <span class="c1"># Get bbox for the geometry</span>
+    <span class="k">if</span> <span class="n">inPath</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">inPath</span> <span class="o">=</span> <span class="s1">&#39;DATA/SEA_roads_criticality.gpkg&#39;</span>
+
+    <span class="n">roads</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Reproject to self.EPSG</span>
+    <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">))</span>
+
+    <span class="c1"># Save as a feather to outPath</span>
+    <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;roads.feather&#39;</span><span class="p">)</span>
+    <span class="n">roads</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="n">outPath</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.makeInputFileName" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">makeInputFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rootDir</span><span class="p">,</span> <span class="n">nameConstructor</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Create list of filenames based on nameConstructor </p>
+
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">makeInputFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rootDir</span><span class="p">,</span> <span class="n">nameConstructor</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Create list of filenames based on nameConstructor &#39;&#39;&#39;</span>
+    <span class="n">flName</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">nameConstructor</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+        <span class="n">fl</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">fl</span> <span class="o">=</span> <span class="n">rootDir</span><span class="o">+</span><span class="n">fl</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span><span class="o">+</span><span class="n">fl</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
+        <span class="n">flName</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">flName</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.prepareHazard" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">prepareHazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hazard</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Prepare the hazard layers</p>
+<p>Loads the files for a given hazard defined as hazard['hazard'] and from hazard['nameConstructor'] from the hazards/ folder.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>hazard</code></td>
+        <td><code>dict</code></td>
+        <td><p>Main hazard dictionary</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Geotif</code></td>
+      <td><p>A geotif image</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">prepareHazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hazard</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Prepare the hazard layers</span>
+
+<span class="sd">        Loads the files for a given hazard defined as hazard[&#39;hazard&#39;] and from hazard[&#39;nameConstructor&#39;] from the hazards/ folder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            hazard (dict): Main hazard dictionary</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Geotif: A geotif image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Preparing hazard: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;hazard&#39;</span><span class="p">]))</span>
+    <span class="c1"># Set path and folders</span>
+    <span class="n">targetDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outPath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_hazard&#39;</span><span class="p">,</span> <span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;hazard&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">targetDir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">targetDir</span><span class="p">)</span>
+
+    <span class="c1"># Create a list of file names</span>
+    <span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makeInputFileName</span><span class="p">(</span><span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;rootDir&#39;</span><span class="p">],</span> <span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;nameConstructor&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Align files</span>
+    <span class="k">for</span> <span class="n">inPath</span> <span class="ow">in</span> <span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]:</span>
+        <span class="n">outPath</span> <span class="o">=</span> <span class="n">inPath</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;rootDir&#39;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">outPath</span> <span class="o">=</span> <span class="n">outPath</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.asc&#39;</span><span class="p">,</span> <span class="s1">&#39;.tif&#39;</span><span class="p">)</span>
+        <span class="n">outPath</span> <span class="o">=</span> <span class="s1">&#39;volcanoes/</span><span class="si">{}</span><span class="s1">/_hazard/</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;hazard&#39;</span><span class="p">],</span> <span class="n">outPath</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  - Processing: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outPath</span><span class="p">))</span>
+
+        <span class="c1"># If asc file, need to define projection</span>
+        <span class="c1"># if inPath[-3:] == &#39;asc&#39;:</span>
+        <span class="c1">#     inPath = asc2raster(inPath, hazard</span>
+        <span class="c1">#                        )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="n">inPath</span><span class="p">,</span> <span class="n">outPath</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="n">hazard</span><span class="p">[</span><span class="s1">&#39;epsg&#39;</span><span class="p">])</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="volcgis.eruption.makeZoneBoundaries" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">makeZoneBoundaries</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Calculates the boundaries in m from a central point. Useful when
+    a boundary falls outside the limit of the zone defined by the central
+    point.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>x</code></td>
+        <td><code>float</code></td>
+        <td><p>Easting of the central point</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>y</code></td>
+        <td><code>float</code></td>
+        <td><p>Northing of the central point</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>xmin</code></td>
+        <td><code>float</code></td>
+        <td><p>Minimum Easting of the bounding box</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>xmax</code></td>
+        <td><code>float</code></td>
+        <td><p>Maximum Easting of the bounding box</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>ymin</code></td>
+        <td><code>float</code></td>
+        <td><p>Minimum Northing of the bounding box</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>ymax</code></td>
+        <td><code>float</code></td>
+        <td><p>Maximum Northing of the bounding box</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>tuple</code></td>
+      <td><p>A tuple containing <code>xmin</code>, <code>xmax</code>, <code>ymin</code>, <code>ymax</code></p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">makeZoneBoundaries</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculates the boundaries in m from a central point. Useful when</span>
+<span class="sd">            a boundary falls outside the limit of the zone defined by the central</span>
+<span class="sd">            point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (float): Easting of the central point</span>
+<span class="sd">            y (float): Northing of the central point</span>
+<span class="sd">            xmin (float): Minimum Easting of the bounding box</span>
+<span class="sd">            xmax (float): Maximum Easting of the bounding box</span>
+<span class="sd">            ymin (float): Minimum Northing of the bounding box</span>
+<span class="sd">            ymax (float): Maximum Northing of the bounding box</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing `xmin`, `xmax`, `ymin`, `ymax`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">xmin</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">+</span><span class="n">xmin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="n">xmin</span>
+
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">x</span>
+
+        <span class="k">if</span> <span class="n">ymin</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">+</span><span class="n">ymin</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="n">ymin</span>
+
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">y</span>
+
+        <span class="k">return</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="volcgis.eruption.parseDistanceMatrix" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">parseDistanceMatrix</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="n">cX</span><span class="p">,</span> <span class="n">cY</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Loads a geotif with xarray and returns the matrices containing data, 
+    x coordinates, y coordinates and distance from a central point.
+    Adapted from https://xarray.pydata.org/en/v0.10.4/auto_gallery/plot_rasterio.html</p>
+<div class="highlight"><pre><span></span><code>!!! args
+    pth (str): Path to the geotif file
+    cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`
+    cY (float): Same as `cX` for y coordinate
+    level (int): The depth of the data dimension to read
+
+!!! returns
+    tuple: A tuple containing the following matrices, all of which have the same dimension:
+
+    - `data (np.array)`: The data matrix
+    - `x (np.array)`: The x-coordinate matrix
+    - `y (np.array)`: The y-coordinate matrix
+    - `dist (np.array)`: The matrix containing distances from `[cX, cY]` in the same unit as `pth`
+</code></pre></div>
+
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">parseDistanceMatrix</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="n">cX</span><span class="p">,</span> <span class="n">cY</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a geotif with xarray and returns the matrices containing data, </span>
+<span class="sd">        x coordinates, y coordinates and distance from a central point.</span>
+<span class="sd">        Adapted from https://xarray.pydata.org/en/v0.10.4/auto_gallery/plot_rasterio.html</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pth (str): Path to the geotif file</span>
+<span class="sd">            cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`</span>
+<span class="sd">            cY (float): Same as `cX` for y coordinate</span>
+<span class="sd">            level (int): The depth of the data dimension to read </span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: A tuple containing the following matrices, all of which have the same dimension: </span>
+
+<span class="sd">            - `data (np.array)`: The data matrix</span>
+<span class="sd">            - `x (np.array)`: The x-coordinate matrix</span>
+<span class="sd">            - `y (np.array)`: The y-coordinate matrix</span>
+<span class="sd">            - `dist (np.array)`: The matrix containing distances from `[cX, cY]` in the same unit as `pth`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Open raster with xarray and make meshgrid</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">level</span><span class="p">,:,:]</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">da</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">da</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Compute distance to vent</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">((</span><span class="n">x</span><span class="o">-</span><span class="n">cX</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">((</span><span class="n">y</span><span class="o">-</span><span class="n">cY</span><span class="p">),</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">dist</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../changelog/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Changelog" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Changelog
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../volcGIS_exposureAnalysis/" class="md-footer__link md-footer__link--next" aria-label="Next: Module exposureAnalysis" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Module exposureAnalysis
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.76f349be.min.js"></script>
+      
+    
+  </body>
+</html>

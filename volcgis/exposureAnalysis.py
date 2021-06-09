@@ -5,8 +5,7 @@ import volcgis
 from rasterio.plot import show
 import rasterio as rio
 import pandas as pd
-from pyproj import CRS
-from pyproj import Transformer
+from pyproj import CRS, Transformer
 import numpy as np
 import scipy.stats
 import math
@@ -14,7 +13,7 @@ import math
 # from printy import printy
 import fiona
 import geopandas as gpd
-from shapely.geometry import shape
+from shapely.geometry import shape, mapping
 # from alive_progress import alive_bar
 import time
 import json
@@ -29,9 +28,12 @@ def updateRSDS(RSDS, rsds):
     in the column name. Just thinking along mapping them on a GIS, it will make more sense to have all the data in one single
     file so only one join is required.
     
-    Arguments:
+    Args:
         RSDS (pd.DataFrame): Main storage, row is `Road_ID`, column is a given hazard occurrence
-        rsds (pd.DataFrame): RSDS for one hazard occurrence, row is `Road_ID`,
+        rsds (pd.DataFrame): RSDS for one hazard occurrence, row is `Road_ID`
+
+    Returns:
+        pd.DataFrame: Updated RSDS dataframe
     """
     
     rsds_tmp = rsds.copy()
@@ -46,7 +48,25 @@ def updateRSDS(RSDS, rsds):
         
 def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volume, pop, crops, urban, RNDS, buildingsLoss):
     """
-        Updates main exposure. Buildings loss is in millions.
+        Updates main exposure dataframe. Buildings loss is in millions.
+        
+        Args:
+            EXPOSURE (pd.DataFrame): Main dataframe to update
+            volcano (str): Volcano name
+            hazard (str): Hazard name
+            VEI (float): VEI
+            prob (float): Probability
+            intensity (float): Hazard intensity
+            buffer (float): 
+            volume (float):
+            pop (float):
+            crops (float):
+            urban (float):
+            RNDS (float):
+            buildingsLoss (float):
+            
+        Returns:
+            pd.DataFrame: Updated data frame
     """
     
     expTmp = {
@@ -124,60 +144,108 @@ def updateBuildingExposure(damageRatio, damageState, volcano, VEI, prob, typ, DR
 
     return damageRatio.append(DR), damageState.append(DS)
 
-def getExposure(haz_data, pop_data, LC_data, res, val):
-    """ Get exposure 
+def getExposure(haz_data, pop_data, LC_data, res, val, LC={'crops':40, 'urban':50}):
+    """ This is the most basic exposure function. It compute the exposure of i) population from Landsat, 
+            ii) urban area and iii) crop area from CGLS from a simple mask with hazard data. For the landcover 
+            data, using `CGLS` so `urban==50` and `crops==40`.   
+            
+        - 2021-06-09: Made the function flexible to account for variable LC classes
     
+        Args:
+            haz_data (np.array): Hazard data
+            pop_data (xarray): Population density data
+            LC_data (xarray): Landcover data
+            res (int): Raster resolution 
+            val (float): Hazard value to mask
+            LC (dict): Dictionary containing `'class_name': class_val`
+    
+        Returns:
+            dict: A dictionary containing `pop_count` (float) and one exposure value for each dict entry in `LC`: 
+        
+            
     """
     
-    # Get hazard index
-    idx = haz_data >= val
-    # Population
-    popTmp = np.sum(pop_data[idx])
-
-    # Landcover / crops km2
-    idx = (haz_data >= val) & (LC_data==40)
-    cropsTmp = np.sum(idx)*res**2/1e6
+    # Read xio data
+    # LC_data = LC_data.data[0]
+    # pop_data = pop_data.data[0]
     
-    # Landcover / urban km2
-    idx = (haz_data >= val) & (LC_data==50)
-    urbanTmp = np.sum(idx)*res**2/1e6
+    exposure = {}
+    
+    # Get hazard index
+    # Population
+    idx = (haz_data >= val) & (pop_data.data[0] > 0)
+    popTmp = np.nansum(np.nansum(pop_data.where(idx).data[0]))
+    exposure['pop_count'] = round(popTmp,0)
+    
+    
+    # Landcover
+    for LCi in LC.keys():
+        # Landcover / crops km2
+        idx = (haz_data >= val) & (LC_data.data[0]==LC[LCi])
+        # LCTmp = np.nansum(np.nansum(LC_data.where(idx).data[0]))*res**2/1e6
+        exposure[LCi] = np.sum(idx)*res**2/1e6
 
-    return round(popTmp,0), round(cropsTmp,0), round(urbanTmp,0)
+    return exposure 
+    # # Landcover / crops km2
+    # idx = (haz_data >= val) & (LC_data==40)
+    # cropsTmp = np.sum(idx)*res**2/1e6
+    
+    # # Landcover / urban km2
+    # idx = (haz_data >= val) & (LC_data==50)
+    # urbanTmp = np.sum(idx)*res**2/1e6
 
-def getBufferExposure(buffer, fl):
+    # # New
+    # return round(popTmp,0), round(cropsTmp,0), round(urbanTmp,0)
+
+def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50}):
     """ Get exposure 
     
+    Args:
+        buffer (pd.DataFrame):
     """
     
-    # Get hazard index
-    idx = haz_data >= val
-    # Population
-    popTmp = np.sum(pop_data[idx])
+    bufferTot = []
 
-    # Landcover / crops km2
-    idx = (haz_data >= val) & (LC_data==40)
-    cropsTmp = np.sum(idx)*res**2/1e6
-    
-    # Landcover / urban km2
-    idx = (haz_data >= val) & (LC_data==50)
-    urbanTmp = np.sum(idx)*res**2/1e6
+    # Loop through buffers
+    for iB in buffer.index.values:
+        bufferTmp = []
+        
+        # List of shapely geometries
+        geoms = buffer.loc[[iB]].geometry.values 
+        # transform to GeJSON format
+        geoms = [mapping(geoms[0])]    
+        
+        popTmp, _ = rio.mask.mask(pop_data, geoms)
+        bufferTmp['pop_count'] = round(sum(popTmp[popTmp>0]),0)
+        
+        LCtmp, _ = rio.mask.mask(LC_data, geoms)
+        # Landcover
+        for LCi in LC.keys():
+            bufferTmp[LCi] = round(np.sum(LCtmp[(LCtmp > 0) & (LC_data==LC[LCi])])*res**2/1e6, 0)
+            
+        # cropsTmp = sum(LCtmp[(LCtmp > 0) & (LC_data==40)])*res**2/1e6
+        # urbanTmp = sum(LCtmp[(LCtmp > 0) & (LC_data==50)])*res**2/1e6
+        
+        bufferTot[iB] = bufferTmp
 
-    return round(popTmp,0), round(cropsTmp,0), round(urbanTmp,0)
+    return bufferTot
 
 def getRNDS(hazardPath, dictMap, road, epsg, intensity):
     """
-    Arguments:
-        hazardPath (str): Path to hazard file
-        dictMap (dict): 
-        road (gpd): 
-        epsg (int): Digits of the epsg code
-        intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)
+        Arguments:
+            hazardPath (str): Path to hazard file
+            dictMap (dict): 
+            road (gpd): 
+            epsg (int): Digits of the epsg code
+            intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)
 
-    Returns:
-        rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)
-        roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. 
-                                    Each row is a road type, each column is a single value defined in dictMap
-        rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`
+        Returns:
+            tuple: A tuple containing: 
+            
+            - rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  
+            - roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. 
+                                Each row is a road type, each column is a single value defined in dictMap  
+            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`  
     """
 
     # Make sure dicMap is ordered in decreasing keys

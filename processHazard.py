@@ -2,10 +2,11 @@
 import os
 import sys
 # os.chdir('/Users/seb/Documents/Codes/VolcGIS')
-import volcgis 
+import volcgis
 from volcgis.exposureAnalysis import *
 from rasterio.plot import show
 import rasterio as rio
+import rioxarray as xrio
 import pandas as pd
 from pyproj import CRS
 from pyproj import Transformer
@@ -235,15 +236,18 @@ for i in rng:
     if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
 
         # Read datasets
-        LC = rio.open(LCf)
-        pop = rio.open(popf)
+        # LC = rio.open(LCf)
+        LC = xrio.open_rasterio(LCf)
+        # pop = rio.open(popf)
+        pop = xrio.open_rasterio(popf)
         road = gpd.read_feather(roadf)
         buildW = rio.open(buildWf)
         buildS = rio.open(buildSf)
         
         # Read and adjust
-        LC_data = LC.read(1)
-        pop_data = pop.read(1)/(1000/res)**2
+        # LC_data = LC.read(1)
+        # pop_data = pop.read(1)/(1000/res)**2
+        pop.data = pop.data/(1000/res)**2
         buildW_data = buildW.read(1)
         buildS_data = buildS.read(1)
         
@@ -292,7 +296,7 @@ for i in rng:
                     exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, None, None, None, None, None, None, rnds, round((DRs.loss.sum()+DRw.loss.sum())/1e6,2))
                     
                     for iM in intT:
-                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop_data, LC_data, res, iM)
+                        popTmp, cropsTmp, urbanTmp = getExposure(haz_data, pop, LC, res, iM)
                         
                         # If the value of iM is found in roadLength, then add the value of roadLength to exposure
                         if iM in roadLength.columns:

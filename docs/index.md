@@ -9,7 +9,7 @@ Welcome to the documentation page for **VolcGIS**!
 - Extract global exposure data and figures for various hazard types and scenarios
 - Implement methodologies to estimate *some* aspects of vulnerability, impact and risk
 
-**VolcGIS** is available on [Github](https://github.com/vharg/VolcGIS).
+**VolcGIS** is available on [Github](https://github.com/vharg/VolcGIS), documentation is available at [vharg.github.io/VolcGIS/](https://vharg.github.io/VolcGIS/). Check out the [demo notebook](https://vharg.github.io/VolcGIS/MASTER_example/) to get started.
 
 ## Install
 

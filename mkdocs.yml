@@ -1,5 +1,7 @@
 site_name: volcGIS
-site_url: https://example.com/
+site_url: https://vharg.github.io/VolcGIS/
+repo_url: https://github.com/vharg/VolcGIS
+repo_name: vharg/VolcGIS
 
 theme:
   name: material
@@ -8,18 +10,30 @@ theme:
   #     - navigation.sections
   #     - navigation.expand
   icon:
-      repo: fontawesome/brands/github
+    repo: fontawesome/brands/github
+  palette:
+    scheme: slate
+    accent: pink
 
 nav:
   - Home: index.md
-  - Getting started:
-    - Install: install.md
-    - Basic commands: basic.md
-    - Tips: tips.md
-    - Changelog: changelog.md
+  - Demo: MASTER_example.py
+  # - Getting started:
+  #   - Install: install.md
+    # - Tips: tips.md
+    # - Changelog: changelog.md
   - volcGIS API:
+    # - Main module: volcGIS.md
     - Module eruption: volcGIS_eruption.md
+    - Module exposureAnalysis: volcGIS_exposureAnalysis.md
 
 plugins:
     - search
     - mkdocstrings
+    - mkdocs-jupyter:
+        execute: True
+        include_source: True
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences

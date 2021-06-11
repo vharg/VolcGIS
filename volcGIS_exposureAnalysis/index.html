@@ -9,7 +9,7 @@
       
       
       
-        <link rel="canonical" href="https://example.com/volcGIS_exposureAnalysis/">
+        <link rel="canonical" href="https://vharg.github.io/VolcGIS/volcGIS_exposureAnalysis/">
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.2, mkdocs-material-7.1.7">
@@ -52,7 +52,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent="">
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent="pink">
   
     
     <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
@@ -213,73 +213,10 @@
   
   
   
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
-      
-      <label class="md-nav__link" for="__nav_2">
-        Getting started
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-      <nav class="md-nav" aria-label="Getting started" data-md-level="1">
-        <label class="md-nav__title" for="__nav_2">
-          <span class="md-nav__icon md-icon"></span>
-          Getting started
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../install/" class="md-nav__link">
-        Install
+      <a href="../MASTER_example/" class="md-nav__link">
+        VolcGIS Demo
       </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../basic/" class="md-nav__link">
-        Basic commands
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tips/" class="md-nav__link">
-        Tips
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
-        Changelog
-      </a>
-    </li>
-  
-
-          
-        </ul>
-      </nav>
     </li>
   
 
@@ -358,6 +295,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#volcgis.exposureAnalysis" class="md-nav__link">
@@ -469,6 +413,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#volcgis.exposureAnalysis" class="md-nav__link">
     volcgis.exposureAnalysis
   </a>
@@ -556,7 +507,8 @@
                 
                 
                 <h1 id="volcgisexposureanalysis">volcGIS.exposureAnalysis</h1>
-<p>The module <code>volcgis.exposureAnalysis</code> contains most functions to estimate exposure and impact.</p>
+<p><code>volcgis.exposureAnalysis</code> contains undocumented functions to estimate exposure and impact. This is a working module to implement new functionalities, so use with caution.</p>
+<h2 id="api">API</h2>
 
 
   <div class="doc doc-object doc-module">
@@ -581,36 +533,121 @@
 
 
 <h2 id="volcgis.exposureAnalysis.getBufferExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">fl</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span></code>
 
 
 </h2>
 
     <div class="doc doc-contents ">
 
-      <p>Get exposure </p>
+      <p>Get exposure as concentric circles around the vent</p>
 
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>buffer</code></td>
+        <td><code>pd.DataFrame</code></td>
+        <td><p>List of buffers as defined in <code>erup.buffer</code></p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>pop_data</code></td>
+        <td><code>xarray</code></td>
+        <td><p>Population density data</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>LC_data</code></td>
+        <td><code>xarray</code></td>
+        <td><p>Landcover data</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>res</code></td>
+        <td><code>int</code></td>
+        <td><p>Raster resolution </p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>val</code></td>
+        <td><code>float</code></td>
+        <td><p>Hazard value to mask</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>LC</code></td>
+        <td><code>dict</code></td>
+        <td><p>Dictionary containing <code>'class_name': class_val</code></p></td>
+        <td><code>{&#39;crops&#39;: 40, &#39;urban&#39;: 50}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>dict</code></td>
+      <td><p>A dictionary containing <code>pop_count</code> (float) and one exposure value for each dict entry in <code>LC</code>: </p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">fl</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Get exposure </span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">}):</span>
+    <span class="sd">&quot;&quot;&quot; Get exposure as concentric circles around the vent</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        buffer (pd.DataFrame): List of buffers as defined in `erup.buffer`</span>
+<span class="sd">        pop_data (xarray): Population density data</span>
+<span class="sd">        LC_data (xarray): Landcover data</span>
+<span class="sd">        res (int): Raster resolution </span>
+<span class="sd">        val (float): Hazard value to mask</span>
+<span class="sd">        LC (dict): Dictionary containing `&#39;class_name&#39;: class_val`</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A dictionary containing `pop_count` (float) and one exposure value for each dict entry in `LC`: </span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># Get hazard index</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span>
-    <span class="c1"># Population</span>
-    <span class="n">popTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pop_data</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="n">bufferTot</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="c1"># Landcover / crops km2</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">==</span><span class="mi">40</span><span class="p">)</span>
-    <span class="n">cropsTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
+    <span class="c1"># Loop through buffers</span>
+    <span class="k">for</span> <span class="n">iB</span> <span class="ow">in</span> <span class="n">buffer</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="n">bufferTmp</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="c1"># Landcover / urban km2</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">==</span><span class="mi">50</span><span class="p">)</span>
-    <span class="n">urbanTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
+        <span class="c1"># Create GDF for clipping</span>
+        <span class="n">geoms</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">iB</span><span class="p">]])</span>
 
-    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">popTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">cropsTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">urbanTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Population</span>
+        <span class="n">popB</span> <span class="o">=</span> <span class="n">pop_data</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">geoms</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">popB</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">popTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">popB</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">bufferTmp</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">popTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Landcover</span>
+        <span class="n">LCB</span> <span class="o">=</span> <span class="n">LC_data</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">geoms</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">LCi</span> <span class="ow">in</span> <span class="n">LC</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">LCB</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">LC</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span>
+            <span class="n">bufferTmp</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">bufferTot</span><span class="p">[</span><span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="n">bufferTmp</span>
+
+    <span class="k">return</span> <span class="n">bufferTot</span>
 </code></pre></div>
         </details>
     </div>
@@ -773,14 +810,19 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
 
 <h2 id="volcgis.exposureAnalysis.getExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span></code>
 
 
 </h2>
 
     <div class="doc doc-contents ">
 
-      <p>Compute exposure from masking exposure datasets with hazard data. For the landcover data, using <code>CGLS</code> so <code>urban==50</code> and <code>crops==40</code></p>
+      <p>This is the most basic exposure function. It compute the exposure of i) population from Landsat, 
+    ii) urban area and iii) crop area from CGLS from a simple mask with hazard data. For the landcover 
+    data, using <code>CGLS</code> so <code>urban==50</code> and <code>crops==40</code>.   </p>
+<ul>
+<li>2021-06-09: Made the function flexible to account for variable LC classes</li>
+</ul>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -801,13 +843,13 @@ load_mean, load_disp, tot_rep_cost</p></td>
       </tr>
       <tr>
         <td><code>pop_data</code></td>
-        <td><code>np.array</code></td>
+        <td><code>xarray</code></td>
         <td><p>Population density data</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>LC_data</code></td>
-        <td><code>np.array</code></td>
+        <td><code>xarray</code></td>
         <td><p>Landcover data</p></td>
         <td><em>required</em></td>
       </tr>
@@ -823,6 +865,12 @@ load_mean, load_disp, tot_rep_cost</p></td>
         <td><p>Hazard value to mask</p></td>
         <td><em>required</em></td>
       </tr>
+      <tr>
+        <td><code>LC</code></td>
+        <td><code>dict</code></td>
+        <td><p>Dictionary containing <code>'class_name': class_val</code></p></td>
+        <td><code>{&#39;crops&#39;: 40, &#39;urban&#39;: 50}</code></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -835,50 +883,46 @@ load_mean, load_disp, tot_rep_cost</p></td>
   </thead>
   <tbody>
     <tr>
-      <td><code>tuple</code></td>
-      <td><p>A tuple containing: </p>
-<ul>
-<li><code>population (float)</code>: Cumulative number of people within hazard value</li>
-<li><code>crops (float)</code>: Total exposed crop area (km^2)  </li>
-<li><code>urban (float)</code>: Total exposed urban area (km^2)    </li>
-</ul></td>
+      <td><code>dict</code></td>
+      <td><p>A dictionary containing <code>pop_count</code> (float) and one exposure value for each dict entry in <code>LC</code>: </p></td>
     </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Compute exposure from masking exposure datasets with hazard data. For the landcover data, using `CGLS` so `urban==50` and `crops==40`</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">}):</span>
+    <span class="sd">&quot;&quot;&quot; This is the most basic exposure function. It compute the exposure of i) population from Landsat, </span>
+<span class="sd">            ii) urban area and iii) crop area from CGLS from a simple mask with hazard data. For the landcover </span>
+<span class="sd">            data, using `CGLS` so `urban==50` and `crops==40`.   </span>
+
+<span class="sd">        - 2021-06-09: Made the function flexible to account for variable LC classes</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            haz_data (np.array): Hazard data</span>
-<span class="sd">            pop_data (np.array): Population density data</span>
-<span class="sd">            LC_data (np.array): Landcover data</span>
+<span class="sd">            pop_data (xarray): Population density data</span>
+<span class="sd">            LC_data (xarray): Landcover data</span>
 <span class="sd">            res (int): Raster resolution </span>
 <span class="sd">            val (float): Hazard value to mask</span>
+<span class="sd">            LC (dict): Dictionary containing `&#39;class_name&#39;: class_val`</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            tuple: A tuple containing: </span>
-
-<span class="sd">            - `population (float)`: Cumulative number of people within hazard value</span>
-<span class="sd">            - `crops (float)`: Total exposed crop area (km^2)  </span>
-<span class="sd">            - `urban (float)`: Total exposed urban area (km^2)    </span>
+<span class="sd">            dict: A dictionary containing `pop_count` (float) and one exposure value for each dict entry in `LC`: </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># Get hazard index</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span>
+    <span class="n">exposure</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="c1"># Population</span>
-    <span class="n">popTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pop_data</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pop_data</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">popTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">pop_data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">popTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># Landcover / crops km2</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">==</span><span class="mi">40</span><span class="p">)</span>
-    <span class="n">cropsTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
+    <span class="c1"># Landcover</span>
+    <span class="k">for</span> <span class="n">LCi</span> <span class="ow">in</span> <span class="n">LC</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1"># Landcover / crops km2</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">LC</span><span class="p">[</span><span class="n">LCi</span><span class="p">])</span>
+        <span class="n">exposure</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
 
-    <span class="c1"># Landcover / urban km2</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">==</span><span class="mi">50</span><span class="p">)</span>
-    <span class="n">urbanTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
-
-    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">popTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">cropsTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="nb">round</span><span class="p">(</span><span class="n">urbanTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exposure</span> 
 </code></pre></div>
         </details>
     </div>
@@ -982,11 +1026,12 @@ load_mean, load_disp, tot_rep_cost</p></td>
     <tr>
       <td><code>tuple</code></td>
       <td><p>A tuple containing: </p>
-<div class="highlight"><pre><span></span><code>- rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)
-- roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. 
-                    Each row is a road type, each column is a single value defined in dictMap
-- rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`
-</code></pre></div></td>
+<ul>
+<li>rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  </li>
+<li>roadLength (pd.DataFrame): Length of each road type defined in the <code>highway</code> column of the road variable. 
+                    Each row is a road type, each column is a single value defined in dictMap  </li>
+<li>rsds (pd.DataFrame): RSDS value of each road segment defined by <code>Road_ID</code>  </li>
+</ul></td>
     </tr>
   </tbody>
 </table>
@@ -1004,10 +1049,10 @@ load_mean, load_disp, tot_rep_cost</p></td>
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: A tuple containing: </span>
 
-<span class="sd">                - rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)</span>
-<span class="sd">                - roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. </span>
-<span class="sd">                                    Each row is a road type, each column is a single value defined in dictMap</span>
-<span class="sd">                - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`</span>
+<span class="sd">            - rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  </span>
+<span class="sd">            - roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. </span>
+<span class="sd">                                Each row is a road type, each column is a single value defined in dictMap  </span>
+<span class="sd">            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`  </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Make sure dicMap is ordered in decreasing keys</span>

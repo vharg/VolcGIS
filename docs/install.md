@@ -30,5 +30,5 @@ pip install alive-progress
 To install the documentation:
 
 ```
-pip install mkdocs-material mkdocstrings livereload
+pip install mkdocs-material mkdocstrings livereload mkdocs-jupyter
 ```

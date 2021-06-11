@@ -1,9 +1,7 @@
-# volcGIS
+# volcGIS.eruption
 
-Main module to:
+`volcGIS.eruption` contains the most basic features for exposure analysis and is currently the most documented module. Refer to the demo for an example on its use.
 
-- Setup eruptions
-- Pre-process hazard data
-- Pre-process exposure data
+## API
 
 ::: volcgis.eruption

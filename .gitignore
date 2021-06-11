@@ -4,12 +4,17 @@
 *.prj
 *.gpkg
 *.feather
+*.qgz
 hazards/
 volcanoes/
-
 gede/
 DATA/
 SK/
+csv/
+Paper/
+site/
+Gekko_scripts/
+
 .DS_Store
 
 .vscode

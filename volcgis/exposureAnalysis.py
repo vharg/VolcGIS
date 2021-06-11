@@ -158,74 +158,63 @@ def getExposure(haz_data, pop_data, LC_data, res, val, LC={'crops':40, 'urban':5
             res (int): Raster resolution 
             val (float): Hazard value to mask
             LC (dict): Dictionary containing `'class_name': class_val`
-    
+
         Returns:
             dict: A dictionary containing `pop_count` (float) and one exposure value for each dict entry in `LC`: 
-        
-            
     """
     
-    # Read xio data
-    # LC_data = LC_data.data[0]
-    # pop_data = pop_data.data[0]
-    
     exposure = {}
-    
-    # Get hazard index
+
     # Population
     idx = (haz_data >= val) & (pop_data.data[0] > 0)
     popTmp = np.nansum(np.nansum(pop_data.where(idx).data[0]))
     exposure['pop_count'] = round(popTmp,0)
-    
-    
+       
     # Landcover
     for LCi in LC.keys():
         # Landcover / crops km2
         idx = (haz_data >= val) & (LC_data.data[0]==LC[LCi])
-        # LCTmp = np.nansum(np.nansum(LC_data.where(idx).data[0]))*res**2/1e6
         exposure[LCi] = np.sum(idx)*res**2/1e6
 
     return exposure 
-    # # Landcover / crops km2
-    # idx = (haz_data >= val) & (LC_data==40)
-    # cropsTmp = np.sum(idx)*res**2/1e6
-    
-    # # Landcover / urban km2
-    # idx = (haz_data >= val) & (LC_data==50)
-    # urbanTmp = np.sum(idx)*res**2/1e6
-
-    # # New
-    # return round(popTmp,0), round(cropsTmp,0), round(urbanTmp,0)
 
 def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50}):
-    """ Get exposure 
+    """ Get exposure as concentric circles around the vent
     
     Args:
-        buffer (pd.DataFrame):
+        buffer (pd.DataFrame): List of buffers as defined in `erup.buffer`
+        pop_data (xarray): Population density data
+        LC_data (xarray): Landcover data
+        res (int): Raster resolution 
+        val (float): Hazard value to mask
+        LC (dict): Dictionary containing `'class_name': class_val`
+
+    Returns:
+        dict: A dictionary containing `pop_count` (float) and one exposure value for each dict entry in `LC`: 
+
     """
-    
-    bufferTot = []
+
+    bufferTot = {}
 
     # Loop through buffers
     for iB in buffer.index.values:
-        bufferTmp = []
+        bufferTmp = {}
         
-        # List of shapely geometries
-        geoms = buffer.loc[[iB]].geometry.values 
-        # transform to GeJSON format
-        geoms = [mapping(geoms[0])]    
+        # Create GDF for clipping
+        geoms = gpd.GeoDataFrame(buffer.loc[[iB]])
+
+        # Population
+        popB = pop_data.rio.clip(geoms.geometry)
+        idx = popB.data[0] > 0
+        popTmp = np.nansum(np.nansum(popB.where(idx).data[0]))
+        bufferTmp['pop_count'] = round(popTmp,0)
         
-        popTmp, _ = rio.mask.mask(pop_data, geoms)
-        bufferTmp['pop_count'] = round(sum(popTmp[popTmp>0]),0)
-        
-        LCtmp, _ = rio.mask.mask(LC_data, geoms)
         # Landcover
+        LCB = LC_data.rio.clip(geoms.geometry)
         for LCi in LC.keys():
-            bufferTmp[LCi] = round(np.sum(LCtmp[(LCtmp > 0) & (LC_data==LC[LCi])])*res**2/1e6, 0)
-            
-        # cropsTmp = sum(LCtmp[(LCtmp > 0) & (LC_data==40)])*res**2/1e6
-        # urbanTmp = sum(LCtmp[(LCtmp > 0) & (LC_data==50)])*res**2/1e6
-        
+            idx = LCB.data[0]==LC[LCi]
+            bufferTmp[LCi] = round(np.sum(idx)*res**2/1e6,0)
+
         bufferTot[iB] = bufferTmp
 
     return bufferTot

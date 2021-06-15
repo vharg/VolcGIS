@@ -39,7 +39,7 @@ class eruption:
         Returns:
             object: eruption object
         '''
-
+        
         self.path = path
         # self.path['outPath'] = 'volcanoes' if outPath == None else outPath
         # Set default variables
@@ -76,8 +76,9 @@ class eruption:
                      eruption['extent'][1],
                      eruption['extent'][3])
         self.area = gpd.GeoDataFrame({'geometry': areaPl}, index=[0], crs=self.EPSG_proj) # Area is now projected
-        self.areaG = self.area.to_crs(from_epsg(4326)) # Project it
-
+        # breakpoint()
+        # self.areaG = self.area.to_crs(from_epsg(4326)) # Project it
+        self.areaG = self.area.to_crs(4326) # Project it
         # Define buffers
         tmp = pd.DataFrame(self.vent, index=[0])
         gdf = gpd.GeoDataFrame(tmp, geometry=gpd.points_from_xy(tmp.easting, tmp.northing), crs=self.EPSG_proj)

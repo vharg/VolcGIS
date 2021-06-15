@@ -40,6 +40,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     
       
     
@@ -227,6 +229,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -234,14 +266,14 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
       
-      <label class="md-nav__link" for="__nav_3">
+      <label class="md-nav__link" for="__nav_5">
         volcGIS API
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="volcGIS API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           volcGIS API
         </label>
@@ -358,13 +390,6 @@
           <li class="md-nav__item">
   <a href="#volcgis.eruption.eruption.plot" class="md-nav__link">
     plot()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#volcgis.eruption.eruption.plotArea" class="md-nav__link">
-    plotArea()
   </a>
   
 </li>
@@ -534,13 +559,6 @@
           <li class="md-nav__item">
   <a href="#volcgis.eruption.eruption.plot" class="md-nav__link">
     plot()
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#volcgis.eruption.eruption.plotArea" class="md-nav__link">
-    plotArea()
   </a>
   
 </li>
@@ -783,8 +801,9 @@ If None, set to [10, 30, 100].</p></td>
                  <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
                  <span class="n">eruption</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">areaPl</span><span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span> <span class="c1"># Area is now projected</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">areaG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">4326</span><span class="p">))</span> <span class="c1"># Project it</span>
-
+    <span class="c1"># breakpoint()</span>
+    <span class="c1"># self.areaG = self.area.to_crs(from_epsg(4326)) # Project it</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">areaG</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span> <span class="c1"># Project it</span>
     <span class="c1"># Define buffers</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vent</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">gpd</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">easting</span><span class="p">,</span> <span class="n">tmp</span><span class="o">.</span><span class="n">northing</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span>
@@ -1082,15 +1101,28 @@ If None, set to [10, 30, 100].</p></td>
         <td><code>None</code></td>
       </tr>
   </tbody>
-</table>      <p>!!! returns
-     image: A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p>
-
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>image</code></td>
+      <td><p>A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBuildingExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Retrieves building exposure from George&#39;s analysis for area defined by self.area.</span>
 
-<span class="sd">   Args:</span>
+<span class="sd">    Args:</span>
 <span class="sd">        inPath (str): Path to corresponding raster</span>
 
 <span class="sd">    Returns:</span>
@@ -1120,7 +1152,8 @@ If None, set to [10, 30, 100].</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data</p>
+      <p>Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
+        This function is deprecated, use <code>prepareExposure</code> instead</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1140,15 +1173,29 @@ If None, set to [10, 30, 100].</p></td>
         <td><code>None</code></td>
       </tr>
   </tbody>
-</table>      <p>!!! returns
-     image: A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p>
-
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>image</code></td>
+      <td><p>A geotif cropped, aligned and projected to <code>self.ref['bounds']</code></p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getLandcover</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Retrieves Landcover data for the area defined by self.area. Resampling is set to &#39;nearest&#39; for discrete data</span>
+<span class="sd">            This function is deprecated, use `prepareExposure` instead</span>
 
-<span class="sd">   Args:</span>
+<span class="sd">    Args:</span>
 <span class="sd">        inPath (str): Path to corresponding raster. If `None`, set to `&#39;DATA/LC100_2018_croped.tif&#39;`</span>
 
 <span class="sd">    Returns:</span>
@@ -1180,7 +1227,8 @@ If None, set to [10, 30, 100].</p></td>
 
     <div class="doc doc-contents ">
 
-      <p>Retrieves Landscan data for the area defined by self.area.</p>
+      <p>Retrieves Landscan data for the area defined by self.area.
+        This function is deprecated, use <code>prepareExposure</code> instead</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1220,6 +1268,7 @@ If None, set to [10, 30, 100].</p></td>
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getLandscan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Retrieves Landscan data for the area defined by self.area.</span>
+<span class="sd">            This function is deprecated, use `prepareExposure` instead</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        inPath (str): Path to corresponding raster. If `None`, set to `&#39;DATA/Landscan.tif&#39;`</span>
@@ -1257,6 +1306,7 @@ If None, set to [10, 30, 100].</p></td>
 
     <div class="doc doc-contents ">
 
+      <p>This function is deprecated, use <code>prepareExposure</code> instead</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1295,7 +1345,7 @@ If None, set to [10, 30, 100].</p></td>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getRoadNetwork</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inPath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;This function is deprecated, use `prepareExposure` instead</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        inPath (str): Path to the main roads dataset. If `None`, set to `&#39;DATA/SEA_roads_criticality.gpkg&#39;`</span>
@@ -1493,45 +1543,8 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 
 
 
-<h3 id="volcgis.eruption.eruption.plotArea" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">plotArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
-
-
-</h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Plots the extent of self.area on a map with a basemap</p>
-
-        <details class="quote">
-          <summary>Source code in <code>volcgis/eruption.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plotArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Plots the extent of self.area on a map with a basemap</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_geo</span><span class="p">,</span> <span class="s1">&#39;EPSG:3857&#39;</span><span class="p">)</span>
-    <span class="p">[</span><span class="n">xtmp</span><span class="p">,</span> <span class="n">ytmp</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vent</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">vent</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
-
-    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">areaG</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s1">&#39;EPSG:3857&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xtmp</span><span class="p">,</span> <span class="n">ytmp</span><span class="p">,</span> <span class="s1">&#39;^r&#39;</span><span class="p">)</span>
-    <span class="n">ctx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
 <h3 id="volcgis.eruption.eruption.prepareExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 
 </h3>
@@ -1561,6 +1574,12 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <td><code>landcover</code></td>
         <td><code>bool</code></td>
         <td><p>Process landcover data</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>roads</code></td>
+        <td><code>bool</code></td>
+        <td><p>Process OSM road data</p></td>
         <td><code>True</code></td>
       </tr>
       <tr>
@@ -1597,12 +1616,13 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span>
                     <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Prepares datasets for exposure analysis.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            population (bool): Process population data</span>
 <span class="sd">            landcover (bool): Process landcover data</span>
+<span class="sd">            roads (bool): Process OSM road data</span>
 <span class="sd">            populationInt (str): Interpolation method for population data, accepts `&#39;nearest&#39;` and `&#39;cubic&#39;`</span>
 <span class="sd">            landcoverInt (str): Interpolation method for landcover data, accepts `&#39;nearest&#39;` and `&#39;cubic&#39;`</span>
 <span class="sd">            populationRes (int): Original resolution of population data</span>
@@ -1611,6 +1631,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">expType</span> <span class="o">=</span> <span class="p">{}</span>
+
     <span class="k">if</span> <span class="n">population</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;population.tif&#39;</span><span class="p">)</span>
         <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;populationPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">],</span> <span class="n">resampling</span><span class="o">=</span><span class="n">populationInt</span><span class="p">)</span>
@@ -1635,6 +1656,24 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;landcoverPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;LC_class&#39;</span><span class="p">],</span> <span class="n">resampling</span><span class="o">=</span><span class="n">landcoverInt</span><span class="p">)</span>
         <span class="n">expType</span><span class="p">[</span><span class="s1">&#39;LC_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
+    <span class="k">if</span> <span class="n">roads</span><span class="p">:</span>
+        <span class="c1"># Re-project self.areaG to pseudo mercator 3857</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">3857</span><span class="p">))</span>
+
+        <span class="c1"># Get bbox for the geometry</span>
+        <span class="c1"># if inPath is None:</span>
+        <span class="c1">#     inPath = &#39;DATA/SEA_roads_criticality.gpkg&#39;</span>
+        <span class="c1"># roads = gpd.read_file(inPath, bbox=bbox[&#39;geometry&#39;])</span>
+        <span class="n">roads</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roadsPath&#39;</span><span class="p">],</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Reproject to self.EPSG</span>
+        <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">))</span>
+
+        <span class="c1"># Save as a feather to outPath</span>
+        <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;roads.feather&#39;</span><span class="p">)</span>
+        <span class="n">roads</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="n">outPath</span><span class="p">)</span>
+        <span class="n">expType</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;expType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">expType</span>
 </code></pre></div>
         </details>
@@ -1657,7 +1696,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
     <div class="doc doc-contents ">
 
       <p>Prepare the hazard layers</p>
-<p>Loads the files for a given hazard defined as hazard['hazard'] and from hazard['nameConstructor'] from the hazards/ folder.</p>
+<p>Loads the files for a given hazard defined as <code>hazard['hazard']</code> and from <code>hazard['nameConstructor']</code> from the <code>hazards/</code> folder.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1704,7 +1743,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">prepareHazard</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">noAlign</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Prepare the hazard layers</span>
 
-<span class="sd">        Loads the files for a given hazard defined as hazard[&#39;hazard&#39;] and from hazard[&#39;nameConstructor&#39;] from the hazards/ folder.</span>
+<span class="sd">        Loads the files for a given hazard defined as `hazard[&#39;hazard&#39;]` and from `hazard[&#39;nameConstructor&#39;]` from the `hazards/` folder.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            hazard (dict): Main hazard dictionary</span>
@@ -1780,26 +1819,59 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
     <div class="doc doc-contents ">
 
       <p>Finds the EPSG code associated with a pair of lat, lon coordinates</p>
-<div class="highlight"><pre><span></span><code>!!! args
-    lat (float): Latitude (decimal degrees). Negative in S hemisphere
-    lon (float): Longitude (decimal degrees). Negative in W hemisphere
 
-!!! returns
-    int: The integer EPSG code
-</code></pre></div>
-
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>lat</code></td>
+        <td><code>float</code></td>
+        <td><p>Latitude (decimal degrees). Negative in S hemisphere</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>lon</code></td>
+        <td><code>float</code></td>
+        <td><p>Longitude (decimal degrees). Negative in W hemisphere</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>int</code></td>
+      <td><p>The integer EPSG code</p></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getEPSG</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Finds the EPSG code associated with a pair of lat, lon coordinates</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            lat (float): Latitude (decimal degrees). Negative in S hemisphere</span>
-<span class="sd">            lon (float): Longitude (decimal degrees). Negative in W hemisphere</span>
+<span class="sd">    Args:</span>
+<span class="sd">        lat (float): Latitude (decimal degrees). Negative in S hemisphere</span>
+<span class="sd">        lon (float): Longitude (decimal degrees). Negative in W hemisphere</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            int: The integer EPSG code</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The integer EPSG code</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1966,22 +2038,71 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
       <p>Loads a geotif with xarray and returns the matrices containing data, 
     x coordinates, y coordinates and distance from a central point.
     Adapted from https://xarray.pydata.org/en/v0.10.4/auto_gallery/plot_rasterio.html</p>
-<div class="highlight"><pre><span></span><code>!!! args
-    pth (str): Path to the geotif file
-    cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`
-    cY (float): Same as `cX` for y coordinate
-    band (int): The band number of the data dimension to read
-    epsg (int): EPSG string (e.g.&#39;epsg:32749&#39;) to which the raster will be reprojected before computing distance
 
-!!! returns
-    tuple: A tuple containing the following matrices, all of which have the same dimension:
-
-    - `data (np.array)`: The data matrix
-    - `x (np.array)`: The x-coordinate matrix
-    - `y (np.array)`: The y-coordinate matrix
-    - `dist (np.array)`: The matrix containing distances from `[cX, cY]` in the same unit as `pth`
-</code></pre></div>
-
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>pth</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to the geotif file</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cX</code></td>
+        <td><code>float</code></td>
+        <td><p>x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as <code>pth</code></p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cY</code></td>
+        <td><code>float</code></td>
+        <td><p>Same as <code>cX</code> for y coordinate</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>band</code></td>
+        <td><code>int</code></td>
+        <td><p>The band number of the data dimension to read</p></td>
+        <td><code>0</code></td>
+      </tr>
+      <tr>
+        <td><code>epsg</code></td>
+        <td><code>int</code></td>
+        <td><p>EPSG string (e.g.'epsg:32749') to which the raster will be reprojected before computing distance</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>tuple</code></td>
+      <td><p>A tuple containing the following matrices, all of which have the same dimension: </p>
+<ul>
+<li><code>data (np.array)</code>: The data matrix</li>
+<li><code>x (np.array)</code>: The x-coordinate matrix</li>
+<li><code>y (np.array)</code>: The y-coordinate matrix</li>
+<li><code>dist (np.array)</code>: The matrix containing distances from <code>[cX, cY]</code> in the same unit as <code>pth</code></li>
+</ul></td>
+    </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">parseDistanceMatrix</span><span class="p">(</span><span class="n">pth</span><span class="p">,</span> <span class="n">cX</span><span class="p">,</span> <span class="n">cY</span><span class="p">,</span> <span class="n">band</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1990,14 +2111,14 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 <span class="sd">        x coordinates, y coordinates and distance from a central point.</span>
 <span class="sd">        Adapted from https://xarray.pydata.org/en/v0.10.4/auto_gallery/plot_rasterio.html</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            pth (str): Path to the geotif file</span>
-<span class="sd">            cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`</span>
-<span class="sd">            cY (float): Same as `cX` for y coordinate</span>
-<span class="sd">            band (int): The band number of the data dimension to read</span>
-<span class="sd">            epsg (int): EPSG string (e.g.&#39;epsg:32749&#39;) to which the raster will be reprojected before computing distance</span>
+<span class="sd">    Args:</span>
+<span class="sd">        pth (str): Path to the geotif file</span>
+<span class="sd">        cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`</span>
+<span class="sd">        cY (float): Same as `cX` for y coordinate</span>
+<span class="sd">        band (int): The band number of the data dimension to read</span>
+<span class="sd">        epsg (int): EPSG string (e.g.&#39;epsg:32749&#39;) to which the raster will be reprojected before computing distance</span>
 
-<span class="sd">        Returns:</span>
+<span class="sd">    Returns:</span>
 <span class="sd">            tuple: A tuple containing the following matrices, all of which have the same dimension: </span>
 
 <span class="sd">            - `data (np.array)`: The data matrix</span>
@@ -2054,7 +2175,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../MASTER_example/" class="md-footer__link md-footer__link--prev" aria-label="Previous: VolcGIS Demo" rel="prev">
+        <a href="../tips/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Tips" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -2063,7 +2184,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
               <span class="md-footer__direction">
                 Previous
               </span>
-              VolcGIS Demo
+              Tips
             </div>
           </div>
         </a>

@@ -40,6 +40,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     
       
     
@@ -227,6 +229,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -234,14 +266,14 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
       
-      <label class="md-nav__link" for="__nav_3">
+      <label class="md-nav__link" for="__nav_5">
         volcGIS API
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="volcGIS API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           volcGIS API
         </label>
@@ -963,13 +995,17 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
 
 <h2 id="volcgis.exposureAnalysis.getRNDS" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">getRNDS</span><span class="p">(</span><span class="n">hazardPath</span><span class="p">,</span> <span class="n">dictMap</span><span class="p">,</span> <span class="n">road</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">intensity</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">getRNDS</span><span class="p">(</span><span class="n">hazardPath</span><span class="p">,</span> <span class="n">dictMap</span><span class="p">,</span> <span class="n">road</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">minArea</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">numPolyThresh</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></code>
 
 
 </h2>
 
     <div class="doc doc-contents ">
 
+      <p>Converts hazard data into polygon and clip the road network. The contouring of hazard data can be quite
+    unstable, so the function provides a few option to filter possible small polygons. Having small polygons
+    is not a problem on its own but it can significantly increase computation time as one clipping action is
+    performed per polygon.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1012,6 +1048,18 @@ load_mean, load_disp, tot_rep_cost</p></td>
         <td><p>Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)</p></td>
         <td><em>required</em></td>
       </tr>
+      <tr>
+        <td><code>minArea</code></td>
+        <td><code>int</code></td>
+        <td><p>Minimum number of pixels required keep a polygon (i.e. polygons with less pixels are discarded)</p></td>
+        <td><code>3</code></td>
+      </tr>
+      <tr>
+        <td><code>numPolyThresh</code></td>
+        <td><code>int</code></td>
+        <td><p>Number of polygons above which some more filtering will be done</p></td>
+        <td><code>5</code></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -1029,30 +1077,48 @@ load_mean, load_disp, tot_rep_cost</p></td>
 <ul>
 <li>rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  </li>
 <li>roadLength (pd.DataFrame): Length of each road type defined in the <code>highway</code> column of the road variable. 
-                    Each row is a road type, each column is a single value defined in dictMap  </li>
-<li>rsds (pd.DataFrame): RSDS value of each road segment defined by <code>Road_ID</code>  </li>
+                    Each row is a road type, each column is a single value defined in dictMap. Note that the length in 
+                    a given column is computed over the entire area of the hazard footprint (e.g. in the case of a 1 and 100)
+                    kg/m2 isopach, the length within the 1 kg/m2 isopach comprises roads covered by 100 kg/m2).</li>
+<li>rsds (pd.DataFrame): RSDS value of each road segment defined by <code>Road_ID</code></li>
 </ul></td>
     </tr>
   </tbody>
-</table>
+</table>      <p>!!! changelog
+    - 2021-06-14: Changed strategy to clip roads when <code>intensity == True</code>
+    - 2021-06-15: Cleaned and made topology more robust</p>
+
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getRNDS</span><span class="p">(</span><span class="n">hazardPath</span><span class="p">,</span> <span class="n">dictMap</span><span class="p">,</span> <span class="n">road</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">intensity</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getRNDS</span><span class="p">(</span><span class="n">hazardPath</span><span class="p">,</span> <span class="n">dictMap</span><span class="p">,</span> <span class="n">road</span><span class="p">,</span> <span class="n">epsg</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">minArea</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">numPolyThresh</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts hazard data into polygon and clip the road network. The contouring of hazard data can be quite</span>
+<span class="sd">            unstable, so the function provides a few option to filter possible small polygons. Having small polygons</span>
+<span class="sd">            is not a problem on its own but it can significantly increase computation time as one clipping action is</span>
+<span class="sd">            performed per polygon.</span>
+
 <span class="sd">        Arguments:</span>
 <span class="sd">            hazardPath (str): Path to hazard file</span>
 <span class="sd">            dictMap (dict): </span>
 <span class="sd">            road (gpd): </span>
 <span class="sd">            epsg (int): Digits of the epsg code</span>
 <span class="sd">            intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)</span>
+<span class="sd">            minArea (int): Minimum number of pixels required keep a polygon (i.e. polygons with less pixels are discarded)</span>
+<span class="sd">            numPolyThresh (int): Number of polygons above which some more filtering will be done</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: A tuple containing: </span>
 
 <span class="sd">            - rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  </span>
 <span class="sd">            - roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. </span>
-<span class="sd">                                Each row is a road type, each column is a single value defined in dictMap  </span>
-<span class="sd">            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`  </span>
+<span class="sd">                                Each row is a road type, each column is a single value defined in dictMap. Note that the length in </span>
+<span class="sd">                                a given column is computed over the entire area of the hazard footprint (e.g. in the case of a 1 and 100)</span>
+<span class="sd">                                kg/m2 isopach, the length within the 1 kg/m2 isopach comprises roads covered by 100 kg/m2).</span>
+<span class="sd">            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`</span>
+
+<span class="sd">        Changelog:</span>
+<span class="sd">            - 2021-06-14: Changed strategy to clip roads when `intensity == True`</span>
+<span class="sd">            - 2021-06-15: Cleaned and made topology more robust</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Make sure dicMap is ordered in decreasing keys</span>
@@ -1071,7 +1137,8 @@ load_mean, load_disp, tot_rep_cost</p></td>
     <span class="k">with</span> <span class="n">rio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">hazardPath</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
         <span class="c1">#Read image</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="c1"># Loop through dictMap, which returns threshold and impact score</span>
         <span class="c1"># for threshold, score in dictMap.items():</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">inpVal</span><span class="p">)):</span>
@@ -1081,34 +1148,61 @@ load_mean, load_disp, tot_rep_cost</p></td>
             <span class="n">score</span> <span class="o">=</span> <span class="n">inpVal</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="c1"># Create a mask</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">image</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+
+            <span class="c1"># fig, ax = plt.subplots(1)</span>
+            <span class="c1"># show(mask[i],ax=ax)</span>
+            <span class="c1"># ax.set(xlim=[4900,5100], ylim=[1500,1000])</span>
 
             <span class="c1"># In case the hazard type is tephra and the loop is not pointing to the innermost zone,</span>
             <span class="c1"># then we substract the previous mask</span>
-            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">intensity</span><span class="p">:</span>
-                <span class="n">maskP</span> <span class="o">=</span> <span class="n">image</span> <span class="o">&gt;=</span> <span class="n">inpVal</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">maskP</span> <span class="o">=</span> <span class="n">maskP</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">-</span> <span class="n">maskP</span>
+            <span class="c1"># if i &gt; 0 and intensity:</span>
+            <span class="c1">#     maskP = image &gt;= inpVal[i - 1][0]</span>
+            <span class="c1">#     maskP = maskP.astype(&#39;uint8&#39;)</span>
+            <span class="c1">#     mask = mask - maskP</span>
 
-            <span class="n">shapes</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
+            <span class="n">shapes</span> <span class="o">=</span> <span class="n">rio</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">shapes</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span>
             <span class="c1"># Extract geometry from shapes</span>
             <span class="n">geometry</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">shapedict</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">geometry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">shapedict</span><span class="p">))</span>
+                    <span class="c1"># This makes sure there is no hole in the polygon ane that all polygons are valid</span>
+                    <span class="c1"># This slows down the processes significantly </span>
+                    <span class="n">shp</span> <span class="o">=</span> <span class="n">shape</span><span class="p">(</span><span class="n">shapedict</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">shp</span><span class="o">.</span><span class="n">area</span><span class="o">&gt;=</span><span class="p">(</span><span class="n">minArea</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="p">):</span>
+                        <span class="n">geometry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">shp</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)))</span>
 
-            <span class="c1"># Create gdf for clipping</span>
-            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-                <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">geometry</span><span class="p">},</span>
-                <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+            <span class="c1"># If there are more than 5 polygons (this is arbitrary), then add a buffer equal to the resolution of the hazard data</span>
+            <span class="c1"># to try and prevent polygons separated by one pixel</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">numPolyThresh</span><span class="p">:</span>
+                <span class="n">printy</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> Ok, there are quite some polygons, I will try to clean these for you&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">)</span>
+                <span class="n">geometry</span> <span class="o">=</span> <span class="p">[</span><span class="n">unary_union</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="o">.</span><span class="n">simplify</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">preserve_topology</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+
             <span class="c1"># In case the mask for the given threshold is empty</span>
-            <span class="k">if</span> <span class="n">gdf</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">rnds</span><span class="p">[</span><span class="n">threshold</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-
+            <span class="c1"># In case the mask for the given threshold is empty</span>
+            <span class="c1"># if gdf.size == 0:</span>
+            <span class="c1">#     rnds[threshold] = 0</span>
+                <span class="c1"># roadLength.loc[roadLengthTmp.index, threshold] = 0</span>
+                <span class="n">road</span><span class="p">[</span><span class="s1">&#39;RSDS_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">threshold</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># In case a MultiPolygon is returned, convert it back to a list of polygons</span>
+                <span class="k">if</span> <span class="s1">&#39;MultiPolygon&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                    <span class="n">geometry</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="c1"># Create gdf for clipping</span>
+                <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">geometry</span><span class="p">},</span>
+                    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">epsg</span><span class="p">))</span>
+
                 <span class="c1"># Create GeoDataFrame</span>
-                <span class="n">clipped_road</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">road</span><span class="p">,</span> <span class="n">gdf</span><span class="p">)</span>
+                <span class="n">clipped_road</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">iRow</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">gdf</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">clipped_road</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">road</span><span class="p">,</span> <span class="n">gdf</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">iRow</span><span class="p">]])</span>
+
+                <span class="c1"># clipped_road = clipped_road[~clipped_road.is_empty]</span>
                 <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;impact_score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
                 <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;RSDS_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">threshold</span><span class="p">)]</span> <span class="o">=</span> <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;Criticality score&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;LoR_score&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;impact_score&#39;</span><span class="p">]</span>
                 <span class="n">rnds</span><span class="p">[</span><span class="n">threshold</span><span class="p">]</span> <span class="o">=</span> <span class="n">clipped_road</span><span class="p">[</span><span class="s1">&#39;RSDS_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">threshold</span><span class="p">)]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
@@ -1119,18 +1213,47 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
                 <span class="c1"># Append the RSDS to the full road network</span>
                 <span class="n">road</span> <span class="o">=</span> <span class="n">road</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clipped_road</span><span class="p">[[</span><span class="s1">&#39;RSDS_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">threshold</span><span class="p">)]])</span>
-    <span class="c1"># Sum all values</span>
-    <span class="k">if</span> <span class="n">intensity</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
-        <span class="n">rnds</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rnds</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">pass</span>
+                <span class="n">road</span><span class="p">[</span><span class="s1">&#39;RSDS_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">threshold</span><span class="p">)]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="c1"># Filter the RSDS columns to save them with the `Road_ID`</span>
+    <span class="n">rsds</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">road</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;RSDS*&quot;</span><span class="p">)))</span>
+    <span class="c1"># If dictionary contains intensity, get the max between RSDS columns</span>
+
+    <span class="k">if</span> <span class="n">intensity</span><span class="p">:</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">rsds</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
+        <span class="c1"># breakpoint()</span>
+        <span class="n">rsds</span><span class="p">[</span><span class="s1">&#39;RSDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rsds</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;RSDS*&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rsds</span> <span class="o">=</span> <span class="n">rsds</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Sum RNDS values</span>
+        <span class="n">rnds</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">rnds</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="c1"># Filter results</span>
+    <span class="n">rsds</span> <span class="o">=</span> <span class="n">rsds</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">})</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
     <span class="c1"># Remove the highway types that don&#39;t have any data</span>
     <span class="n">roadLength</span> <span class="o">=</span> <span class="n">roadLength</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
-    <span class="c1"># Filter the RSDS columns to save them with the `Road_ID`</span>
-    <span class="n">rsds</span> <span class="o">=</span> <span class="n">road</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;RSDS*&quot;</span><span class="p">))</span>
-    <span class="n">rsds</span> <span class="o">=</span> <span class="n">rsds</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    <span class="c1"># rsds = rsds.loc[rsds[&#39;RSDS&#39;]&gt;0]</span>
+    <span class="c1"># rsds = road.filter(regex=(&quot;RSDS*&quot;))</span>
+    <span class="c1"># rsds = road.filter(regex=(&quot;RSDS*&quot;)).max(axis=1)</span>
+    <span class="c1"># rsds = rsds.dropna(how=&#39;all&#39;)</span>
+
+    <span class="c1"># test</span>
+    <span class="c1"># RD = road.copy()</span>
+    <span class="c1"># RD[&#39;RSDS&#39;]= road.filter(regex=(&quot;RSDS*&quot;)).max(axis=1)</span>
+
+    <span class="c1"># haz_data = xio.open_rasterio(fl)</span>
+    <span class="c1"># fig = plt.figure(figsize=[13,11])</span>
+    <span class="c1"># ax = fig.add_subplot(1, 1, 1)</span>
+    <span class="c1"># cc=[&#39;#ffffd9&#39;,&#39;#edf8b1&#39;,&#39;#c7e9b4&#39;,&#39;#7fcdbb&#39;,&#39;#41b6c4&#39;,&#39;#1d91c0&#39;,&#39;#225ea8&#39;,&#39;#081d58&#39;]</span>
+    <span class="c1"># cnt = 0</span>
+    <span class="c1"># for p in np.sort(RD.RSDS.unique()):</span>
+    <span class="c1">#     if p&gt;0:</span>
+    <span class="c1">#         RD[RD.RSDS==p].plot(ax=ax, color=cc[cnt])</span>
+    <span class="c1">#         cnt+=1</span>
+    <span class="c1"># CS = haz_data.where(haz_data.data&gt;0).squeeze().plot.contour(levels=[1,100], ax=ax, colors=&#39;black&#39;, linewidths=2)</span>
+    <span class="c1"># ax.set(xlim=[2.4e5,3.e5], ylim=[1.5e6,1.6e6])</span>
+    <span class="c1"># # ctx.add_basemap(ax,crs=erup.areaG.crs.to_string())     </span>
+
 
     <span class="k">return</span> <span class="n">rnds</span><span class="p">,</span> <span class="n">roadLength</span><span class="p">,</span> <span class="n">rsds</span>
 </code></pre></div>

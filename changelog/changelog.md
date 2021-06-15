@@ -1,5 +1,17 @@
 # Change log
 
+## 2021-06-15
+
+- Fixed a problem in `volcgis.exposureAnalysis.getRNDS()` that returned wrong results without raising an error. This was due to polygons with complex shapes (e.g. holes in the polygon), which caused problem when clipping with `gpd`. The more I dug, the more I found that small hazard footprints (e.g. BAF) or those with irregular outlines (e.g. PDC) could produce "noisy" polygons at the periphery when contoured with `rio`. I added some filters, which are hopefully flexible enough to handle most case studies.
+
+## 2021-06-10
+
+- Added `v0.2.0`
+- Documented module is now `volcgis.eruption.py`
+- Added documentation with `MASTER_example.py` notebook
+- `volcgis.exposureAnalysis` is still here for the paper, but it will be replaced by the new functions
+- `processHazard_v2.py` is an update for compatibility with `v0.2.0`
+
 ## 2021-03-04
 
 - Moved all exposure analysis functions to `volcgis.exposureAnalysis`

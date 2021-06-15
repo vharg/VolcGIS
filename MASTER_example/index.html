@@ -40,6 +40,8 @@
     
       <link rel="stylesheet" href="../assets/_mkdocstrings.css">
     
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
     
       
     
@@ -343,18 +345,48 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tips/" class="md-nav__link">
+        Tips
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
-      <label class="md-nav__link" for="__nav_3">
+      <label class="md-nav__link" for="__nav_5">
         volcGIS API
         <span class="md-nav__icon md-icon"></span>
       </label>
       <nav class="md-nav" aria-label="volcGIS API" data-md-level="1">
-        <label class="md-nav__title" for="__nav_3">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           volcGIS API
         </label>
@@ -1123,19 +1155,6 @@ all of MD as it is not optimized for dense, information rich UIs.
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
 
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>/Users/seb/.conda/envs/volcgis/lib/python3.9/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
-  return _prepare_from_string(&#34; &#34;.join(pjargs))
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
 
 
 <div class="jp-RenderedImage jp-OutputArea-output ">
@@ -1341,7 +1360,7 @@ Preparing hazard: Tephra
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="prepare-exposure-data">Prepare exposure data<a class="anchor-link" href="#Prepare-exposure-data">&#182;</a></h2><p>This step reprojects global exposure datasets to <code>E.epsg</code>, clip the extent and align pixels to the extent defined by <code>E.area</code>. In the case of population data, the population count is scaled by a ratio of <code>originalRasterResolution</code>/<code>E.res</code>. Processed files are saved in <code>E.path['outPath']</code>/<code>E.name</code>/_data/</p>
+<h2 id="prepare-exposure-data">Prepare exposure data<a class="anchor-link" href="#Prepare-exposure-data">&#182;</a></h2><p>This step reprojects global exposure datasets to <code>E.epsg</code>, clip the extent and align pixels to the extent defined by <code>E.area</code>. In the case of population data, the population count is scaled by a ratio of <code>originalRasterResolution</code>/<code>E.res</code>. Processed files are saved in <code>E.path['outPath']</code>/<code>E.name</code>/_data/. Setting <code>roads=False</code> for now, it will be documented in a future release.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
@@ -1352,7 +1371,7 @@ Preparing hazard: Tephra
         
         
         <div class="CodeMirror cm-s-jupyter">
-    <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">E</span><span class="o">.</span><span class="n">prepareExposure</span><span class="p">()</span>
+    <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">E</span><span class="o">.</span><span class="n">prepareExposure</span><span class="p">(</span><span class="n">roads</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Let&#39;s plot the population dataset and overlay buffers:</span>
 <span class="n">E</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plotExposure</span><span class="o">=</span><span class="s1">&#39;pop&#39;</span><span class="p">,</span> <span class="n">plotBuffer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1586,7 +1605,7 @@ Preparing hazard: Tephra
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;seaborn.axisgrid.FacetGrid at 0x7fb3774b2ca0&gt;</pre>
+<pre>&lt;seaborn.axisgrid.FacetGrid at 0x7feaafb69cd0&gt;</pre>
 </div>
 
 </div>
@@ -1715,13 +1734,13 @@ Preparing hazard: Tephra
       
       
         
-        <a href="../volcGIS_eruption/" class="md-footer__link md-footer__link--next" aria-label="Next: Module eruption" rel="next">
+        <a href="../changelog/" class="md-footer__link md-footer__link--next" aria-label="Next: Changelog" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Module eruption
+              Changelog
             </div>
           </div>
           <div class="md-footer__button md-icon">

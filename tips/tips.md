@@ -1,5 +1,7 @@
 # Tips
 
+This page contains a collection of helpful gists.
+
 ## Plotting geopandas basemaps with contextily
 
 It is possible to plot basemaps to geopandas with [contextily](https://contextily.readthedocs.io). Data needs to be in Web Mercator `EPSG:3875`:

@@ -25,8 +25,7 @@ conda config --env --set channel_priority strict
 Then:
 
 ```
-conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh contextily osmnx
-conda install -c conda-forge holoviews datashader panel param geoviews
+conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh contextily osmnx pyrosm
 ```
 
 ### Additional pip packages
@@ -57,5 +56,3 @@ As a caveat, a critical interpretation of the results is required. Although not 
 ## License
 
 **VolcGIS** is published under a GNU GPL v3 License
-
-## Content

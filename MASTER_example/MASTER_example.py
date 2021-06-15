@@ -123,10 +123,10 @@ E.plot(plotHazard='Tephra', hazLevels=[1,10,100,300], hazProps={'VEI': 5,'prob':
 
 # %% [markdown]
 # ## Prepare exposure data
-# This step reprojects global exposure datasets to `E.epsg`, clip the extent and align pixels to the extent defined by `E.area`. In the case of population data, the population count is scaled by a ratio of `originalRasterResolution`/`E.res`. Processed files are saved in `E.path['outPath']`/`E.name`/_data/
+# This step reprojects global exposure datasets to `E.epsg`, clip the extent and align pixels to the extent defined by `E.area`. In the case of population data, the population count is scaled by a ratio of `originalRasterResolution`/`E.res`. Processed files are saved in `E.path['outPath']`/`E.name`/_data/. Setting `roads=False` for now, it will be documented in a future release. 
 
 # %%
-E.prepareExposure()
+E.prepareExposure(roads=False)
 
 # Let's plot the population dataset and overlay buffers:
 E.plot(plotExposure='pop', plotBuffer=True)

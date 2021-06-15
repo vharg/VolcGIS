@@ -107,12 +107,13 @@ class eruption:
         self.ref['transform'] = affine.Affine(self.res, 0.0, self.ref['bounds'][0], 0.0, -self.res, self.ref['bounds'][3])
         self.ref['EPSG'] = rio.crs.CRS.from_epsg(self.EPSG)
 
-    def prepareExposure(self, population=True, landcover=True, populationInt='nearest', landcoverInt='nearest',
+    def prepareExposure(self, population=True, landcover=True, roads=True, populationInt='nearest', landcoverInt='nearest',
                         populationRes=1000, landcoverRes=100, populationScaling=True):
         """ Prepares datasets for exposure analysis.
             Args:
                 population (bool): Process population data
                 landcover (bool): Process landcover data
+                roads (bool): Process OSM road data
                 populationInt (str): Interpolation method for population data, accepts `'nearest'` and `'cubic'`
                 landcoverInt (str): Interpolation method for landcover data, accepts `'nearest'` and `'cubic'`
                 populationRes (int): Original resolution of population data
@@ -121,6 +122,7 @@ class eruption:
         """
         
         expType = {}
+        
         if population:
             self.path['pop_count'] = os.path.join(self.path['outPath'], self.name, '_data', 'population.tif')
             profile = self.alignRaster(self.path['populationPath'], self.path['pop_count'], resampling=populationInt)
@@ -144,7 +146,25 @@ class eruption:
             self.path['LC_class'] = os.path.join(self.path['outPath'], self.name, '_data', 'landcover.tif')
             self.alignRaster(self.path['landcoverPath'], self.path['LC_class'], resampling=landcoverInt)
             expType['LC_class'] = 1
-        
+            
+        if roads:
+            # Re-project self.areaG to pseudo mercator 3857
+            bbox = self.area.to_crs(from_epsg(3857))
+
+            # Get bbox for the geometry
+            # if inPath is None:
+            #     inPath = 'DATA/SEA_roads_criticality.gpkg'
+            # roads = gpd.read_file(inPath, bbox=bbox['geometry'])
+            roads = gpd.read_file(self.path['roadsPath'], bbox=bbox['geometry'])
+
+            # Reproject to self.EPSG
+            roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
+
+            # Save as a feather to outPath
+            outPath = os.path.join(self.path['outPath'], self.name, '_data', 'roads.feather')
+            roads.to_feather(outPath)
+            expType['roads'] = 1
+            
         self.exposure['expType'] = expType
     
     def getHazardExposure(self, hazard, hazardProps, LC={'crops':40, 'urban':50}):

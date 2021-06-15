@@ -1,6 +1,8 @@
 #%%
 import os
-os.chdir('/Users/seb/Documents/Codes/VolcGIS')
+
+from matplotlib.pyplot import xlim, ylim
+# os.chdir('/Users/seb/Documents/Codes/VolcGIS')
 import volcgis 
 from rasterio.plot import show
 import rasterio as rio
@@ -10,10 +12,11 @@ import numpy as np
 import scipy.stats
 import math
 # import utm
-# from printy import printy
+from printy import printy
 import fiona
 import geopandas as gpd
-from shapely.geometry import shape, mapping
+from shapely.geometry import Polygon, MultiPolygon, shape, mapping
+from shapely.ops import unary_union
 # from alive_progress import alive_bar
 import time
 import json
@@ -219,22 +222,35 @@ def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50
 
     return bufferTot
 
-def getRNDS(hazardPath, dictMap, road, epsg, intensity):
+def getRNDS(hazardPath, dictMap, road, epsg, intensity, minArea=3, numPolyThresh=5):
     """
+        Converts hazard data into polygon and clip the road network. The contouring of hazard data can be quite
+            unstable, so the function provides a few option to filter possible small polygons. Having small polygons
+            is not a problem on its own but it can significantly increase computation time as one clipping action is
+            performed per polygon.
+
         Arguments:
             hazardPath (str): Path to hazard file
             dictMap (dict): 
             road (gpd): 
             epsg (int): Digits of the epsg code
             intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)
-
+            minArea (int): Minimum number of pixels required keep a polygon (i.e. polygons with less pixels are discarded)
+            numPolyThresh (int): Number of polygons above which some more filtering will be done
+            
         Returns:
             tuple: A tuple containing: 
-            
+
             - rnds (float, dict): RNDN value, either as a float (if intensity==True) or a dictionary (if intensity==False)  
             - roadLength (pd.DataFrame): Length of each road type defined in the `highway` column of the road variable. 
-                                Each row is a road type, each column is a single value defined in dictMap  
-            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`  
+                                Each row is a road type, each column is a single value defined in dictMap. Note that the length in 
+                                a given column is computed over the entire area of the hazard footprint (e.g. in the case of a 1 and 100)
+                                kg/m2 isopach, the length within the 1 kg/m2 isopach comprises roads covered by 100 kg/m2).
+            - rsds (pd.DataFrame): RSDS value of each road segment defined by `Road_ID`
+
+        Changelog:
+            - 2021-06-14: Changed strategy to clip roads when `intensity == True`
+            - 2021-06-15: Cleaned and made topology more robust
     """
 
     # Make sure dicMap is ordered in decreasing keys
@@ -253,7 +269,8 @@ def getRNDS(hazardPath, dictMap, road, epsg, intensity):
     with rio.open(hazardPath) as src:
         #Read image
         image = src.read()
-
+        mask = {}
+        res = np.abs(src.transform[0])
         # Loop through dictMap, which returns threshold and impact score
         # for threshold, score in dictMap.items():
         for i in range(0, len(inpVal)):
@@ -263,34 +280,61 @@ def getRNDS(hazardPath, dictMap, road, epsg, intensity):
             score = inpVal[i][1]
 
             # Create a mask
-            mask = image >= threshold
-            mask = mask.astype('uint8')
+            mask[i] = image >= threshold
+            mask[i] = mask[i].astype('uint8')
+            
+            # fig, ax = plt.subplots(1)
+            # show(mask[i],ax=ax)
+            # ax.set(xlim=[4900,5100], ylim=[1500,1000])
 
             # In case the hazard type is tephra and the loop is not pointing to the innermost zone,
             # then we substract the previous mask
-            if i > 0 and intensity:
-                maskP = image >= inpVal[i - 1][0]
-                maskP = maskP.astype('uint8')
-                mask = mask - maskP
+            # if i > 0 and intensity:
+            #     maskP = image >= inpVal[i - 1][0]
+            #     maskP = maskP.astype('uint8')
+            #     mask = mask - maskP
 
-            shapes = rio.features.shapes(mask, transform=src.transform)
+            shapes = rio.features.shapes(mask[i], transform=src.transform)
             # Extract geometry from shapes
             geometry = []
             for shapedict, value in shapes:
                 if value == 1:
-                    geometry.append(shape(shapedict))
-
-            # Create gdf for clipping
-            gdf = gpd.GeoDataFrame(
-                {'geometry': geometry},
-                crs="EPSG:{}".format(epsg))
+                    # This makes sure there is no hole in the polygon ane that all polygons are valid
+                    # This slows down the processes significantly 
+                    shp = shape(shapedict)
+                    if shp.area>=(minArea*res**2):
+                        geometry.append(Polygon(list(shp.buffer(res).exterior.coords)))
+        
+            # If there are more than 5 polygons (this is arbitrary), then add a buffer equal to the resolution of the hazard data
+            # to try and prevent polygons separated by one pixel
+            if len(geometry) > numPolyThresh:
+                printy(f'\t Ok, there are quite some polygons, I will try to clean these for you', 'y')
+                geometry = [unary_union(geometry).buffer(res).simplify(tolerance=res, preserve_topology=False)]
+            
             # In case the mask for the given threshold is empty
-            if gdf.size == 0:
+            if len(geometry) == 0:
                 rnds[threshold] = 0
-
+            # In case the mask for the given threshold is empty
+            # if gdf.size == 0:
+            #     rnds[threshold] = 0
+                # roadLength.loc[roadLengthTmp.index, threshold] = 0
+                road['RSDS_{}'.format(threshold)] = 0
             else:
+                # In case a MultiPolygon is returned, convert it back to a list of polygons
+                if 'MultiPolygon' in str(type(geometry[0])):
+                    geometry = list(geometry[0])
+                    
+                # Create gdf for clipping
+                gdf = gpd.GeoDataFrame(
+                    {'geometry': geometry},
+                    crs="EPSG:{}".format(epsg))
+
                 # Create GeoDataFrame
-                clipped_road = gpd.clip(road, gdf)
+                clipped_road = gpd.GeoDataFrame()
+                for iRow in range(0,gdf.shape[0]):
+                    clipped_road = gpd.clip(road, gdf.iloc[[iRow]])
+                    
+                # clipped_road = clipped_road[~clipped_road.is_empty]
                 clipped_road['impact_score'] = score
                 clipped_road['RSDS_{}'.format(threshold)] = clipped_road['Criticality score'] * clipped_road['LoR_score'] * clipped_road['impact_score']
                 rnds[threshold] = clipped_road['RSDS_{}'.format(threshold)].sum()
@@ -301,18 +345,47 @@ def getRNDS(hazardPath, dictMap, road, epsg, intensity):
     
                 # Append the RSDS to the full road network
                 road = road.join(clipped_road[['RSDS_{}'.format(threshold)]])
-    # Sum all values
-    if intensity==True:
-        rnds = sum(rnds.values())
-    else:
-        pass
+                road['RSDS_{}'.format(threshold)].fillna(0,inplace=True)
+            
+    # Filter the RSDS columns to save them with the `Road_ID`
+    rsds = pd.DataFrame(road.filter(regex=("RSDS*")))
+    # If dictionary contains intensity, get the max between RSDS columns
     
+    if intensity:
+        col = rsds.columns.values
+        # breakpoint()
+        rsds['RSDS'] = rsds.filter(regex=("RSDS*")).max(axis=1)
+        rsds = rsds.drop(col,axis=1)
+        # Sum RNDS values
+        rnds = sum(rnds.values())
+    
+    # Filter results
+    rsds = rsds.replace({0:np.nan}).dropna(how='all')
     # Remove the highway types that don't have any data
     roadLength = roadLength.dropna(how='all')
     
-    # Filter the RSDS columns to save them with the `Road_ID`
-    rsds = road.filter(regex=("RSDS*"))
-    rsds = rsds.dropna(how='all')
+    # rsds = rsds.loc[rsds['RSDS']>0]
+    # rsds = road.filter(regex=("RSDS*"))
+    # rsds = road.filter(regex=("RSDS*")).max(axis=1)
+    # rsds = rsds.dropna(how='all')
+
+    # test
+    # RD = road.copy()
+    # RD['RSDS']= road.filter(regex=("RSDS*")).max(axis=1)
+    
+    # haz_data = xio.open_rasterio(fl)
+    # fig = plt.figure(figsize=[13,11])
+    # ax = fig.add_subplot(1, 1, 1)
+    # cc=['#ffffd9','#edf8b1','#c7e9b4','#7fcdbb','#41b6c4','#1d91c0','#225ea8','#081d58']
+    # cnt = 0
+    # for p in np.sort(RD.RSDS.unique()):
+    #     if p>0:
+    #         RD[RD.RSDS==p].plot(ax=ax, color=cc[cnt])
+    #         cnt+=1
+    # CS = haz_data.where(haz_data.data>0).squeeze().plot.contour(levels=[1,100], ax=ax, colors='black', linewidths=2)
+    # ax.set(xlim=[2.4e5,3.e5], ylim=[1.5e6,1.6e6])
+    # # ctx.add_basemap(ax,crs=erup.areaG.crs.to_string())     
+    
 
     return rnds, roadLength, rsds
 

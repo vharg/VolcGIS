@@ -4,6 +4,7 @@
 # **VolcGIS** is a Python library designed to facilitate exposure analyses to volcanic hazards. This notebook illustrates its use taking Merapi volcano as a case study, considering the probabilistic hazard assessments for tephra using [TephraProb](https://github.com/e5k/TephraProb) and for PDC using https://github.com/AlvaroAravena/ECMapProb.
 #
 # > Biass, S., Bonadonna, C., Connor, L., Connor, C., 2016. TephraProb: a Matlab package for probabilistic hazard assessments of tephra fallout. J. Appl. Volcanol. 5, 1–16. doi:10.1186/s13617-016-0050-5
+#
 # > Aravena, A., Cioni, R., Bevilacqua, A., de' Michieli Vitturi, M., Esposti Ongaro, T., and Neri, A. (2020). Tree‐branching based enhancement of kinetic energy models for reproducing channelization processes of pyroclastic density currents. Journal of Geophysical Research: Solid Earth, 125, e2019JB019271.
 # %%
 import volcgis
@@ -53,7 +54,11 @@ E = volcgis.eruption.eruption(eruption, res, path, extent='relative', buffer=[10
 # We can now plot the study area and, as an option, add the concentric circles with `plotBuffer`. In this case, it is obvious that the 100 km buffer is outside the study area - that is something one should pay attention to.
 E.plot(plotBuffer=True)
 
-
+#%% [markdown]
+# ### Note on the use of OSM data
+# In order to work, the OSM data requires an additional dependency called OSMOSIS and used to clip pre-processed OSM data in `.pbf` format. Before using OSM data, make sure to:
+# 1. Download the `osm.pbf` file for your region/country from [Geofabrik](http://download.geofabrik.de) (i.e. the file to which `OSMroadsPath` must point)
+# 2. Install [Osmosis](https://wiki.openstreetmap.org/wiki/Osmosis/Installation)
 
 # %% [markdown]
 # ## Setting up hazards
@@ -162,14 +167,23 @@ E.plot(plotHazard='PDC', hazLevels=[0.1, 0.5, 0.9], hazProps={'VEI': 4})
 
 # %% [markdown]
 # ## Prepare exposure data
-# This step reprojects global exposure datasets to `E.epsg`, clip the extent and align pixels to the extent defined by `E.area`. In the case of population data, the population count is scaled by a ratio of `originalRasterResolution`/`E.res`. Processed files are saved in `E.path['outPath']`/`E.name`/_data/. Setting `roads=False` for now, it will be documented in a future release. 
+# This step reprojects global exposure datasets to `E.epsg`, clip the extent and align pixels to the extent defined by `E.area`. In the case of population data, the population count is scaled by a ratio of `originalRasterResolution`/`E.res`. Processed files are saved in `E.path['outPath']`/`E.name`/_data/. 
+# Setting `noOSM=True` is for the purpose of this notebook only, please remove.
 
 # %%
-# E.prepareExposure(roads=False)
-E.prepareExposure()
+E.prepareExposure(noOSM=True)
 
+# %% [markdown]
 # Let's plot the population dataset and overlay buffers:
+
+#%%
 E.plot(plotExposure='pop', plotBuffer=True)
+
+# %% [markdown]
+# Let's plot the road network. By default, `Local` roads are not displayed to avoid memory issues. It is possible to customize the appearance of the road network, so check the documentation.
+
+#%%
+E.plot(plotExposure='roads')
 
 # %% [markdown]
 # ## Get exposure data

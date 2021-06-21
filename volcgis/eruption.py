@@ -20,6 +20,9 @@ import xarray as xr
 import rioxarray as xio
 from pyproj import Transformer, CRS
 import os
+from pyrosm import OSM
+from printy import printy
+import pickle
 
 #%%
 class eruption:
@@ -108,6 +111,19 @@ class eruption:
         self.ref['transform'] = affine.Affine(self.res, 0.0, self.ref['bounds'][0], 0.0, -self.res, self.ref['bounds'][3])
         self.ref['EPSG'] = rio.crs.CRS.from_epsg(self.EPSG)
 
+    def save(self,outPth=None):
+        """ Saves eruption object to a pickle.
+        
+        Args:
+            outPth (str): Path to output file. If none, saving as `self.name` in the root folder.
+        """
+        
+        if outPth == None:
+            outPth = f'{self.name}.volc'
+        with open(outPth, 'wb') as f:
+            pickle.dump(self, f)
+        printy(f"Project saved as {outPth}")
+            
     def prepareExposure(self, population=True, landcover=True, roads=True, populationInt='nearest', landcoverInt='nearest',
                         populationRes=1000, landcoverRes=100, populationScaling=True):
         """ Prepares datasets for exposure analysis.
@@ -149,21 +165,54 @@ class eruption:
             expType['LC_class'] = 1
             
         if roads:
-            # Re-project self.areaG to pseudo mercator 3857
-            bbox = self.area.to_crs(from_epsg(3857))
-
-            # Get bbox for the geometry
-            # if inPath is None:
-            #     inPath = 'DATA/SEA_roads_criticality.gpkg'
-            # roads = gpd.read_file(inPath, bbox=bbox['geometry'])
-            roads = gpd.read_file(self.path['roadsPath'], bbox=bbox['geometry'])
-
-            # Reproject to self.EPSG
+            # Set path
+            inPoly = os.path.join(self.path['outPath'], self.name, '_data', 'poly.poly')
+            self.path['roads'] = os.path.join(self.path['outPath'], self.name, '_data', 'roads.feather')
+            outPathTmp = os.path.join(self.path['outPath'], self.name, '_tmp', 'roads.pbf')
+            # Get AOI extent
+            coor = list(self.areaG.iloc[0].geometry.exterior.coords)
+            if os.path.exists(inPoly):
+                os.remove(inPoly)
+            with open(inPoly,'a') as fl:
+                fl.write(f'{self.name}\n')
+                fl.write(f'Poly\n')
+                for c in coor:
+                    fl.write(f'\t{c[0]} {c[1]}\n')
+                fl.write(f'END\n')
+                fl.write(f'END\n')
+    
+            # Clip with OSMOSIS
+            osmosis = f"osmosis --read-pbf file={os.path.abspath(self.path['OSMroadsPath'])} --bounding-polygon file={os.path.abspath(inPoly)} --write-pbf file={os.path.abspath(outPathTmp)}"
+            printy('\t...clipping OSM data, which can take a few minutes...')
+            os.system(osmosis)
+            printy('\t...clipping done!')
+            
+            # Extract data from OSM
+            osm = OSM(outPathTmp)
+            printy('\t...extracting the road network...')
+            roads = osm.get_network(network_type="driving")
+            printy('\t...extracting done!')
+            roads = roads[['highway', 'id', 'geometry']].dropna(how='all')
+            # Reproject
             roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
-
+            
+            # Extract only the main roads
+            highTypes = {
+                'Motorway': ['motorway', 'motorway_link'],
+                'Arterial': ['trunk', 'trunk_link', 'primary', 'primary_link'],
+                'Collector': ['secondary', 'secondary_link', 'tertiary', 'tertiary_link'],
+                'Local': ['unclassified','residential','service','living_street','road','unknown'],
+            }
+            for iH in highTypes.keys():
+                for iR in highTypes[iH]:
+                    roads.loc[roads.highway==iR,'class'] = iH
+            
+            # Drop other roads
+            roads = roads[~roads['class'].isnull()]
+            
             # Save as a feather to outPath
-            outPath = os.path.join(self.path['outPath'], self.name, '_data', 'roads.feather')
-            roads.to_feather(outPath)
+            roads.to_feather(self.path['roads'])
+
             expType['roads'] = 1
             
         self.exposure['expType'] = expType
@@ -188,7 +237,7 @@ class eruption:
         
         # Loop through hazard files
         for i in range(0,self.hazards[hazard]['data'].shape[0]):
-            haz_data = xio.open_rasterio(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth']))
+            haz_data = xio.open_rasterio(self.checkHazPath(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth'])))
 
             # Loop through the thresholds
             for iT in hazardProps['varVal']:
@@ -209,7 +258,7 @@ class eruption:
                 if LC_class:
                     for LCi in LC.keys():
                         idx = (haz_data >= iT) & (LC_data.data[0]==LC[LCi])
-                        exposureTmp[LCi] = np.round(np.sum(idx.data[0])*self.res**2/1e6,0)
+                        exposureTmp[LCi] = np.round(np.sum(idx.data[0])*(self.res**2)/1e6,0)
                 
                 # Update exposure
                 exposure = exposure.append(
@@ -226,10 +275,10 @@ class eruption:
             LC (dict): Dictionary containing `'class_name': class_val`
 
         Returns:
-            pd.DataFrame: A dataFrame saved in `self.exposure['buffer']`. Landcover-based exposure indices are in km2. 
+            pd.DataFrame: A dataFrame saved in `self.exposure['buffer']`. Landcover-based exposure indices are in km2. Road lengths are in km
 
         """
-
+        printy('Computing the exposure as a distance from the vent...')
         index = []
         if 'pop_count' in self.exposure['expType'].keys():
             pop_data = xio.open_rasterio(self.path['pop_count'])
@@ -241,12 +290,20 @@ class eruption:
             index = index + list(LC.keys())
             LC_class = True
             
+        if 'roads' in self.exposure['expType'].keys():
+            LC_data = xio.open_rasterio(self.\path['LC_class'])
+            road_data = gpd.read_feather(self.path['roads'])
+            indexRd = list(road_data['class'].unique())
+            index = index + indexRd
+            road_length = True
+            
         buffer = pd.DataFrame(columns=self.buffer.index.values, index=index)
             
         # Loop through buffers
         for iB in self.buffer.index.values:            
+            printy(f'\t{iB} km...')
             # Create GDF for clipping
-            geoms = gpd.GeoDataFrame(self.buffer.loc[[iB]])
+            geoms = gpd.GeoDataFrame(self.buffer.loc[[iB]],crs=self.EPSG)
 
             # Population
             if pop_count:
@@ -261,11 +318,19 @@ class eruption:
                 for LCi in LC.keys():
                     idx = LCB.data[0]==LC[LCi]
                     buffer.loc[LCi, iB] = round(np.sum(idx)*self.res**2/1e6,0)
+                    
+            # Roads length (in km)
+            if road_length:
+                clipped_roads = gpd.clip(road_data, geoms)
+                clipped_roads['length'] = clipped_roads.geometry.length
+                for iRoads in indexRd:
+                    buffer.loc[iRoads, iB] = round(clipped_roads.loc[clipped_roads['class']==iRoads, 'length'].sum(),0)*1e-3
 
         self.exposure['buffer'] = buffer
 
     def getLandscan(self, inPath=None):
         """ Retrieves Landscan data for the area defined by self.area.
+                This function is deprecated, use `prepareExposure` instead
 
         Args:
             inPath (str): Path to corresponding raster. If `None`, set to `'DATA/Landscan.tif'`
@@ -286,8 +351,9 @@ class eruption:
 
     def getLandcover(self, inPath=None):
         """ Retrieves Landcover data for the area defined by self.area. Resampling is set to 'nearest' for discrete data
-
-       Args:
+                This function is deprecated, use `prepareExposure` instead
+                
+        Args:
             inPath (str): Path to corresponding raster. If `None`, set to `'DATA/LC100_2018_croped.tif'`
 
         Returns:
@@ -303,7 +369,7 @@ class eruption:
     def getBuildingExposure(self, inPath=None, outPath=None):
         """ Retrieves building exposure from George's analysis for area defined by self.area.
 
-       Args:
+        Args:
             inPath (str): Path to corresponding raster
 
         Returns:
@@ -314,7 +380,7 @@ class eruption:
         # if inPath is None:
             
     def getRoadNetwork(self, inPath=None):
-        """
+        """This function is deprecated, use `prepareExposure` instead
 
         Args:
             inPath (str): Path to the main roads dataset. If `None`, set to `'DATA/SEA_roads_criticality.gpkg'`
@@ -343,7 +409,7 @@ class eruption:
     def prepareHazard(self, hazard, noAlign=False):
         """ Prepare the hazard layers
 
-            Loads the files for a given hazard defined as hazard['hazard'] and from hazard['nameConstructor'] from the hazards/ folder.
+            Loads the files for a given hazard defined as `hazard['hazard']` and from `hazard['nameConstructor']` from the `hazards/` folder.
 
             Args:
                 hazard (dict): Main hazard dictionary
@@ -438,13 +504,14 @@ class eruption:
 
         return vrt_options
     
-    def plot(self, plotExposure=None, plotBuffer=None, plotHazard=None, hazLevels=None, hazProps=None, LC={'crops':40, 'urban':50}, figsize = [8,5]):
+    def plot(self, plotExposure=None, plotBuffer=None, plotHazard=None, plotContours=True, hazLevels=None, hazProps=None, LC={'crops':40, 'urban':50}, figsize = [8,5]):
         """ Plot exposure on a map
         
             Args:
                 plotExposure (str): Type of exposure to plot, accepts `LC`, `pop`
                 plotBuffer (bool): Controls if buffers are plotted. They need to be defined in `self.buffer`
                 plotHazard (str): Type of hazard to plot. Must be an entry in `self.hazards`
+                plotContours (bool): Controls if the contours of hazard data are plotted
                 hazLevels (list[int]): Hazard values to contour
                 hazProps (dict): Reference dict to get the hazard file to plot, must correspond to the columns
                     defined in `self.hazards[plotHazard]` and return a unique value
@@ -492,20 +559,23 @@ class eruption:
         # Plot hazard
         if plotHazard is not None:
             hazList = self.hazards[plotHazard]['data']
-            
+            # breakpoint()
             # Retrieve the hazard file
             ttl = f'{ttl} - {plotHazard} ('
             for i in hazProps.keys():
                 hazList = hazList[hazList[i] == hazProps[i]]
                 ttl = f'{ttl}{i}: {hazProps[i]}, '
             ttl = f'{ttl[:-2]})'
+            
             hazPath = os.path.join(self.path['outPath'], self.name, '_hazard',plotHazard, hazList.iloc[0]['filePth'])
+            hazPath = self.checkHazPath(hazPath)
             haz_data = xio.open_rasterio(hazPath)
             haz_data = haz_data.rio.reproject(self.areaG.crs.to_string(), resampling=0)
             
             if plotExposure is None:
                 haz_data.where(haz_data.data>0).plot(cmap='cividis', alpha=.5, ax=ax)
-            CS = haz_data.squeeze().plot.contour(levels=hazLevels, ax=ax, colors='black', linewidths=2)
+            if plotContours:
+                CS = haz_data.squeeze().plot.contour(levels=hazLevels, ax=ax, colors='k', linewidths=2)
             plt.clabel(CS, inline=1, fontsize=10)
 
         # Plot vent
@@ -520,19 +590,22 @@ class eruption:
         plt.xlabel("Longitude")
         plt.tight_layout()
         
-    def plotArea(self):
-        """
-            Plots the extent of self.area on a map with a basemap
+    def checkHazPath(self, hazPath):
+        """ Utility to check if the path string of the hazard file to load ends with `tif`
+        
+        Args:
+            hazPath (str): Path string of the hazard file to load
+    
+        Returns:
+            str: Updated path
+            
         """
         
-        transformer = Transformer.from_crs(self.EPSG_geo, 'EPSG:3857')
-        [xtmp, ytmp] = transformer.transform(self.vent['lat'], self.vent['lon'])
-
-        fig = plt.figure(figsize=[8,10])
-        ax = fig.add_subplot(1, 1, 1)
-        self.areaG.to_crs('EPSG:3857').plot(alpha=0.5,ax=ax)
-        ax.plot(xtmp, ytmp, '^r')
-        ctx.add_basemap(ax)
+        splt = hazPath.split('.')
+        if splt[-1:] != 'tif':
+            return ''.join(splt[:-1])+'.tif'
+        else:
+            return hazPath
 
 def makeZoneBoundaries(x, y, xmin, xmax, ymin, ymax):
         """ Calculates the boundaries in m from a central point. Useful when
@@ -578,14 +651,14 @@ def parseDistanceMatrix(pth, cX, cY, band=0, epsg=None):
         x coordinates, y coordinates and distance from a central point.
         Adapted from https://xarray.pydata.org/en/v0.10.4/auto_gallery/plot_rasterio.html
     
-        Args:
-            pth (str): Path to the geotif file
-            cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`
-            cY (float): Same as `cX` for y coordinate
-            band (int): The band number of the data dimension to read
-            epsg (int): EPSG string (e.g.'epsg:32749') to which the raster will be reprojected before computing distance
-            
-        Returns:
+    Args:
+        pth (str): Path to the geotif file
+        cX (float): x coordinate of the centra point from which distance is calculated. Must be in the same reference coordinate as `pth`
+        cY (float): Same as `cX` for y coordinate
+        band (int): The band number of the data dimension to read
+        epsg (int): EPSG string (e.g.'epsg:32749') to which the raster will be reprojected before computing distance
+
+    Returns:
             tuple: A tuple containing the following matrices, all of which have the same dimension: 
             
             - `data (np.array)`: The data matrix
@@ -611,14 +684,14 @@ def parseDistanceMatrix(pth, cX, cY, band=0, epsg=None):
 def getEPSG(lat, lon):
     """
     Finds the EPSG code associated with a pair of lat, lon coordinates
-    
-        Args:
-            lat (float): Latitude (decimal degrees). Negative in S hemisphere
-            lon (float): Longitude (decimal degrees). Negative in W hemisphere
 
-        Returns:
-            int: The integer EPSG code
-    
+    Args:
+        lat (float): Latitude (decimal degrees). Negative in S hemisphere
+        lon (float): Longitude (decimal degrees). Negative in W hemisphere
+
+    Returns:
+        int: The integer EPSG code
+
     """
     
     # Find the espg
@@ -631,3 +704,17 @@ def getEPSG(lat, lon):
     
     return int(epsg[1])
 # %%
+def load(path):
+    """ Load an eruption object
+    
+    Args:
+        path (str): Path to file
+   
+    Returns:
+        object: A volcGIS eruption object
+    """
+
+    with open(path, 'rb') as f:
+        E = pickle.load(f)
+        
+    return E

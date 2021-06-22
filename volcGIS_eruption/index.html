@@ -379,6 +379,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.checkHazPath" class="md-nav__link">
+    checkHazPath()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#volcgis.eruption.eruption.getBufferExposure" class="md-nav__link">
     getBufferExposure()
   </a>
@@ -434,6 +441,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.save" class="md-nav__link">
+    save()
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -442,6 +456,13 @@
         <li class="md-nav__item">
   <a href="#volcgis.eruption.getEPSG" class="md-nav__link">
     getEPSG()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.load" class="md-nav__link">
+    load()
   </a>
   
 </li>
@@ -548,6 +569,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.checkHazPath" class="md-nav__link">
+    checkHazPath()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#volcgis.eruption.eruption.getBufferExposure" class="md-nav__link">
     getBufferExposure()
   </a>
@@ -603,6 +631,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#volcgis.eruption.eruption.save" class="md-nav__link">
+    save()
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -611,6 +646,13 @@
         <li class="md-nav__item">
   <a href="#volcgis.eruption.getEPSG" class="md-nav__link">
     getEPSG()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volcgis.eruption.load" class="md-nav__link">
+    load()
   </a>
   
 </li>
@@ -843,7 +885,7 @@ If None, set to [10, 30, 100].</p></td>
     <span class="k">for</span> <span class="n">iB</span> <span class="ow">in</span> <span class="n">bufList</span><span class="p">:</span>
         <span class="n">buffer</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">iB</span><span class="o">*</span><span class="mf">1e3</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">iB</span><span class="p">))</span>
     <span class="n">buffer</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">buffer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_proj</span><span class="p">)</span>
 
     <span class="c1"># Create an empty dictionary to store hazard information</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">hazards</span> <span class="o">=</span> <span class="p">{}</span>
@@ -995,6 +1037,80 @@ If None, set to [10, 30, 100].</p></td>
 
 
 
+<h3 id="volcgis.eruption.eruption.checkHazPath" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">checkHazPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hazPath</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Utility to check if the path string of the hazard file to load ends with <code>tif</code></p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>hazPath</code></td>
+        <td><code>str</code></td>
+        <td><p>Path string of the hazard file to load</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>str</code></td>
+      <td><p>Updated path</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">checkHazPath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hazPath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Utility to check if the path string of the hazard file to load ends with `tif`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hazPath (str): Path string of the hazard file to load</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Updated path</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">splt</span> <span class="o">=</span> <span class="n">hazPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">splt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">!=</span> <span class="s1">&#39;tif&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">splt</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;.tif&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">hazPath</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="volcgis.eruption.eruption.getBufferExposure" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">getBufferExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span></code>
 
@@ -1036,7 +1152,7 @@ If None, set to [10, 30, 100].</p></td>
   <tbody>
     <tr>
       <td><code>pd.DataFrame</code></td>
-      <td><p>A dataFrame saved in <code>self.exposure['buffer']</code>. Landcover-based exposure indices are in km2. </p></td>
+      <td><p>A dataFrame saved in <code>self.exposure['buffer']</code>. Landcover-based exposure indices are in km2. Road lengths are in km</p></td>
     </tr>
   </tbody>
 </table>
@@ -1050,10 +1166,10 @@ If None, set to [10, 30, 100].</p></td>
 <span class="sd">        LC (dict): Dictionary containing `&#39;class_name&#39;: class_val`</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: A dataFrame saved in `self.exposure[&#39;buffer&#39;]`. Landcover-based exposure indices are in km2. </span>
+<span class="sd">        pd.DataFrame: A dataFrame saved in `self.exposure[&#39;buffer&#39;]`. Landcover-based exposure indices are in km2. Road lengths are in km</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;Computing the exposure as a distance from the vent...&#39;</span><span class="p">)</span>
     <span class="n">index</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="s1">&#39;pop_count&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;expType&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">pop_data</span> <span class="o">=</span> <span class="n">xio</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">])</span>
@@ -1065,12 +1181,19 @@ If None, set to [10, 30, 100].</p></td>
         <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">LC</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">LC_class</span> <span class="o">=</span> <span class="kc">True</span>
 
+    <span class="k">if</span> <span class="s1">&#39;roads&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;expType&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">road_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_feather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">])</span>
+        <span class="n">indexRd</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">road_data</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="n">indexRd</span>
+        <span class="n">road_length</span> <span class="o">=</span> <span class="kc">True</span>
+
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
 
     <span class="c1"># Loop through buffers</span>
     <span class="k">for</span> <span class="n">iB</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>            
+        <span class="n">printy</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">iB</span><span class="si">}</span><span class="s1"> km...&#39;</span><span class="p">)</span>
         <span class="c1"># Create GDF for clipping</span>
-        <span class="n">geoms</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">iB</span><span class="p">]])</span>
+        <span class="n">geoms</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="n">iB</span><span class="p">]],</span><span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">)</span>
 
         <span class="c1"># Population</span>
         <span class="k">if</span> <span class="n">pop_count</span><span class="p">:</span>
@@ -1085,6 +1208,15 @@ If None, set to [10, 30, 100].</p></td>
             <span class="k">for</span> <span class="n">LCi</span> <span class="ow">in</span> <span class="n">LC</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="n">LCB</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">LC</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span>
                 <span class="n">buffer</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">LCi</span><span class="p">,</span> <span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Roads length (in km)</span>
+        <span class="k">if</span> <span class="n">road_length</span><span class="p">:</span>
+            <span class="n">clipped_roads</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">road_data</span><span class="p">,</span> <span class="n">geoms</span><span class="p">)</span>
+            <span class="n">clipped_roads</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;index_right&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">clipped_roads</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clipped_roads</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span>
+
+            <span class="k">for</span> <span class="n">iRoads</span> <span class="ow">in</span> <span class="n">indexRd</span><span class="p">:</span>
+                <span class="n">buffer</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iRoads</span><span class="p">,</span> <span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">clipped_roads</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">clipped_roads</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">iRoads</span><span class="p">,</span> <span class="s1">&#39;length&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mf">1e-3</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;buffer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buffer</span>
 </code></pre></div>
@@ -1409,7 +1541,7 @@ If None, set to [10, 30, 100].</p></td>
 
 
 <h3 id="volcgis.eruption.eruption.plot" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotExposure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotBuffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotHazard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazLevels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazProps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span></code>
+<code class="highlight language-python"><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotExposure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotBuffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotHazard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotContours</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hazLevels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazProps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">roadType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadColor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadThick</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 
 </h3>
@@ -1448,6 +1580,12 @@ If None, set to [10, 30, 100].</p></td>
         <td><code>None</code></td>
       </tr>
       <tr>
+        <td><code>plotContours</code></td>
+        <td><code>bool</code></td>
+        <td><p>Controls if the contours of hazard data are plotted</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
         <td><code>hazLevels</code></td>
         <td><code>list[int]</code></td>
         <td><p>Hazard values to contour</p></td>
@@ -1470,24 +1608,47 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <td><code>figsize</code></td>
         <td><code>list[float]</code></td>
         <td><p>Figure size</p></td>
-        <td><code>[8, 5]</code></td>
+        <td><code>[10, 7]</code></td>
+      </tr>
+      <tr>
+        <td><code>roadType</code></td>
+        <td><code>list[str]</code></td>
+        <td><p>List of road classes to plot. If <code>None</code>, <code>roadType</code> = ['Collector', 'Arterial', 'Motorway']. If <code>'all'</code>, <code>roadType</code> = ['Local', 'Collector', 'Arterial', 'Motorway']</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>roadColor</code></td>
+        <td><code>dict</code></td>
+        <td><p>Dictionary of road colors to plot. Keys must be equal to <code>roadType</code>. If None, <code>roadColor</code> = {'Local': '#f768a1', 'Collector': '#dd3497', 'Arterial': '#ae017e', 'Motorway': '#7a0177'}]</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>roadThick</code></td>
+        <td><code>dict</code></td>
+        <td><p>Dictionary of road thicknesses to plot. Keys must be equal to <code>roadType</code>. If None, <code>roadThick</code> = {'Local': .5, 'Collector': 1, 'Arterial': 1.5, 'Motorway': 2.3}]</p></td>
+        <td><code>None</code></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotExposure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotBuffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotHazard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazLevels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazProps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">},</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">5</span><span class="p">]):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotExposure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotBuffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotHazard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plotContours</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hazLevels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hazProps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+         <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">},</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span> <span class="n">roadType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadColor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadThick</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Plot exposure on a map</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            plotExposure (str): Type of exposure to plot, accepts `LC`, `pop`</span>
 <span class="sd">            plotBuffer (bool): Controls if buffers are plotted. They need to be defined in `self.buffer`</span>
 <span class="sd">            plotHazard (str): Type of hazard to plot. Must be an entry in `self.hazards`</span>
+<span class="sd">            plotContours (bool): Controls if the contours of hazard data are plotted</span>
 <span class="sd">            hazLevels (list[int]): Hazard values to contour</span>
 <span class="sd">            hazProps (dict): Reference dict to get the hazard file to plot, must correspond to the columns</span>
 <span class="sd">                defined in `self.hazards[plotHazard]` and return a unique value</span>
 <span class="sd">            LC (dict): Dictionary containing `&#39;class_name&#39;: class_val`</span>
 <span class="sd">            figsize (list[float]): Figure size</span>
+<span class="sd">            roadType (list[str]): List of road classes to plot. If `None`, `roadType` = [&#39;Collector&#39;, &#39;Arterial&#39;, &#39;Motorway&#39;]. If `&#39;all&#39;`, `roadType` = [&#39;Local&#39;, &#39;Collector&#39;, &#39;Arterial&#39;, &#39;Motorway&#39;]</span>
+<span class="sd">            roadColor (dict): Dictionary of road colors to plot. Keys must be equal to `roadType`. If None, `roadColor` = {&#39;Local&#39;: &#39;#f768a1&#39;, &#39;Collector&#39;: &#39;#dd3497&#39;, &#39;Arterial&#39;: &#39;#ae017e&#39;, &#39;Motorway&#39;: &#39;#7a0177&#39;}]</span>
+<span class="sd">            roadThick (dict): Dictionary of road thicknesses to plot. Keys must be equal to `roadType`. If None, `roadThick` = {&#39;Local&#39;: .5, &#39;Collector&#39;: 1, &#39;Arterial&#39;: 1.5, &#39;Motorway&#39;: 2.3}]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
@@ -1522,6 +1683,42 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <span class="n">LCplt</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">set_ticks</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">LC</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="n">LCplt</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">set_ticklabels</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">LC</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 
+    <span class="c1"># Plot roads</span>
+    <span class="k">elif</span> <span class="n">plotExposure</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">,</span> <span class="s1">&#39;Roads&#39;</span><span class="p">]:</span>
+        <span class="n">printy</span><span class="p">(</span><span class="s2">&quot;Plotting the road network can be long, don&#39;t complain if that crashes your computer!&quot;</span><span class="p">)</span>
+        <span class="n">road_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_feather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">])</span>
+        <span class="c1"># road_data = gpd.clip(road_data, E.buffer.loc[25].geometry) # for debug</span>
+        <span class="c1"># Reproject</span>
+        <span class="n">road_data</span> <span class="o">=</span> <span class="n">road_data</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG_geo</span><span class="p">)</span>
+
+        <span class="c1"># fig = plt.figure(figsize=figsize)</span>
+        <span class="c1"># ax = fig.add_subplot(1, 1, 1)</span>
+        <span class="c1"># E.areaG.plot(facecolor=&quot;none&quot;, edgecolor=&quot;black&quot;,alpha=0.5,ax=ax)</span>
+
+        <span class="c1"># Setup road design</span>
+        <span class="k">if</span> <span class="n">roadType</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roadType</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Collector&#39;</span><span class="p">,</span> <span class="s1">&#39;Arterial&#39;</span><span class="p">,</span> <span class="s1">&#39;Motorway&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">roadType</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">roadType</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Local&#39;</span><span class="p">,</span> <span class="s1">&#39;Collector&#39;</span><span class="p">,</span> <span class="s1">&#39;Arterial&#39;</span><span class="p">,</span> <span class="s1">&#39;Motorway&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">roadColor</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roadColor</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Local&#39;</span><span class="p">:</span> <span class="s1">&#39;#f768a1&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Collector&#39;</span><span class="p">:</span> <span class="s1">&#39;#dd3497&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Arterial&#39;</span><span class="p">:</span> <span class="s1">&#39;#ae017e&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;Motorway&#39;</span><span class="p">:</span> <span class="s1">&#39;#7a0177&#39;</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">roadThick</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roadThick</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Local&#39;</span><span class="p">:</span> <span class="mf">.5</span><span class="p">,</span>
+                        <span class="s1">&#39;Collector&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="s1">&#39;Arterial&#39;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+                        <span class="s1">&#39;Motorway&#39;</span><span class="p">:</span> <span class="mf">2.3</span><span class="p">}</span>
+        <span class="c1"># Plot the different road classes</span>
+        <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">roadType</span><span class="p">:</span>
+            <span class="n">roadTmp</span> <span class="o">=</span> <span class="n">road_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">road_data</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">iR</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">roadTmp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">roadTmp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">roadColor</span><span class="p">[</span><span class="n">iR</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">roadThick</span><span class="p">[</span><span class="n">iR</span><span class="p">])</span>
+
+
+
     <span class="c1"># Plot buffer</span>
     <span class="k">if</span> <span class="n">plotBuffer</span><span class="p">:</span>
         <span class="n">buf_data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">)</span>
@@ -1530,20 +1727,23 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
     <span class="c1"># Plot hazard</span>
     <span class="k">if</span> <span class="n">plotHazard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">hazList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hazards</span><span class="p">[</span><span class="n">plotHazard</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
-
+        <span class="c1"># breakpoint()</span>
         <span class="c1"># Retrieve the hazard file</span>
         <span class="n">ttl</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ttl</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">plotHazard</span><span class="si">}</span><span class="s1"> (&#39;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">hazProps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">hazList</span> <span class="o">=</span> <span class="n">hazList</span><span class="p">[</span><span class="n">hazList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">hazProps</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
             <span class="n">ttl</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ttl</span><span class="si">}{</span><span class="n">i</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">hazProps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">, &#39;</span>
         <span class="n">ttl</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ttl</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span>
+
         <span class="n">hazPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_hazard&#39;</span><span class="p">,</span><span class="n">plotHazard</span><span class="p">,</span> <span class="n">hazList</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;filePth&#39;</span><span class="p">])</span>
+        <span class="n">hazPath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkHazPath</span><span class="p">(</span><span class="n">hazPath</span><span class="p">)</span>
         <span class="n">haz_data</span> <span class="o">=</span> <span class="n">xio</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">hazPath</span><span class="p">)</span>
         <span class="n">haz_data</span> <span class="o">=</span> <span class="n">haz_data</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">areaG</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="n">resampling</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">plotExposure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">haz_data</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">haz_data</span><span class="o">.</span><span class="n">data</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-        <span class="n">CS</span> <span class="o">=</span> <span class="n">haz_data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="n">hazLevels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">plotContours</span><span class="p">:</span>
+            <span class="n">CS</span> <span class="o">=</span> <span class="n">haz_data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="n">hazLevels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">CS</span><span class="p">,</span> <span class="n">inline</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
     <span class="c1"># Plot vent</span>
@@ -1570,7 +1770,7 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 
 
 <h3 id="volcgis.eruption.eruption.prepareExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">noOSM</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 
 </h3>
@@ -1638,12 +1838,18 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <td><p>Corrects for the change in pixel resolution of population count data</p></td>
         <td><code>True</code></td>
       </tr>
+      <tr>
+        <td><code>noOSM</code></td>
+        <td><code>bool</code></td>
+        <td><p>For debug</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/eruption.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">prepareExposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">landcover</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roads</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">populationInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">landcoverInt</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span>
-                    <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="n">populationRes</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">landcoverRes</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">populationScaling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">noOSM</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Prepares datasets for exposure analysis.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            population (bool): Process population data</span>
@@ -1654,11 +1860,14 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 <span class="sd">            populationRes (int): Original resolution of population data</span>
 <span class="sd">            landcoverRes (int): Original resolution of landcover data</span>
 <span class="sd">            populationScaling (bool): Corrects for the change in pixel resolution of population count data</span>
+<span class="sd">            noOSM (bool): For debug</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;Preparing exposure data...&#39;</span><span class="p">)</span>
     <span class="n">expType</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">if</span> <span class="n">population</span><span class="p">:</span>
+        <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> Population count...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;population.tif&#39;</span><span class="p">)</span>
         <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;populationPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">],</span> <span class="n">resampling</span><span class="o">=</span><span class="n">populationInt</span><span class="p">)</span>
 
@@ -1678,29 +1887,67 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
         <span class="n">expType</span><span class="p">[</span><span class="s1">&#39;pop_count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="n">landcover</span><span class="p">:</span>
+        <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> Land cover...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;LC_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;landcover.tif&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alignRaster</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;landcoverPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;LC_class&#39;</span><span class="p">],</span> <span class="n">resampling</span><span class="o">=</span><span class="n">landcoverInt</span><span class="p">)</span>
         <span class="n">expType</span><span class="p">[</span><span class="s1">&#39;LC_class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="n">roads</span><span class="p">:</span>
-        <span class="c1"># Re-project self.areaG to pseudo mercator 3857</span>
-        <span class="n">bbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">from_epsg</span><span class="p">(</span><span class="mi">3857</span><span class="p">))</span>
+        <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> OSM...&#39;</span><span class="p">)</span>
+        <span class="c1"># Set path</span>
+        <span class="n">inPoly</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;poly.poly&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;roads.feather&#39;</span><span class="p">)</span>
+        <span class="n">outPathTmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_tmp&#39;</span><span class="p">,</span> <span class="s1">&#39;roads.pbf&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Get bbox for the geometry</span>
-        <span class="c1"># if inPath is None:</span>
-        <span class="c1">#     inPath = &#39;DATA/SEA_roads_criticality.gpkg&#39;</span>
-        <span class="c1"># roads = gpd.read_file(inPath, bbox=bbox[&#39;geometry&#39;])</span>
-        <span class="n">roads</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roadsPath&#39;</span><span class="p">],</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">noOSM</span><span class="p">:</span>
+            <span class="c1"># Get AOI extent</span>
+            <span class="n">coor</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">areaG</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">inPoly</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">inPoly</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inPoly</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fl</span><span class="p">:</span>
+                <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Poly</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">coor</span><span class="p">:</span>
+                    <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;END</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">fl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;END</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Reproject to self.EPSG</span>
-        <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">))</span>
+            <span class="c1"># Clip with OSMOSIS</span>
+            <span class="n">osmosis</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;osmosis --read-pbf file=</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;OSMroadsPath&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> --bounding-polygon file=</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">inPoly</span><span class="p">)</span><span class="si">}</span><span class="s2"> --write-pbf file=</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">outPathTmp</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">...clipping OSM data, which can take a few minutes...&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">osmosis</span><span class="p">)</span>
+            <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">...clipping done!&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Save as a feather to outPath</span>
-        <span class="n">outPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;outPath&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_data&#39;</span><span class="p">,</span> <span class="s1">&#39;roads.feather&#39;</span><span class="p">)</span>
-        <span class="n">roads</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="n">outPath</span><span class="p">)</span>
+            <span class="c1"># Extract data from OSM</span>
+            <span class="n">osm</span> <span class="o">=</span> <span class="n">OSM</span><span class="p">(</span><span class="n">outPathTmp</span><span class="p">)</span>
+            <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">...extracting the road network...&#39;</span><span class="p">)</span>
+            <span class="n">roads</span> <span class="o">=</span> <span class="n">osm</span><span class="o">.</span><span class="n">get_network</span><span class="p">(</span><span class="n">network_type</span><span class="o">=</span><span class="s2">&quot;driving&quot;</span><span class="p">)</span>
+            <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">...extracting done!&#39;</span><span class="p">)</span>
+            <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="p">[[</span><span class="s1">&#39;highway&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+            <span class="c1"># Reproject</span>
+            <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPSG</span><span class="p">))</span>
+
+            <span class="c1"># Extract only the main roads</span>
+            <span class="n">highTypes</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;Motorway&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;motorway&#39;</span><span class="p">,</span> <span class="s1">&#39;motorway_link&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;Arterial&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;trunk&#39;</span><span class="p">,</span> <span class="s1">&#39;trunk_link&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="s1">&#39;primary_link&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;Collector&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;secondary&#39;</span><span class="p">,</span> <span class="s1">&#39;secondary_link&#39;</span><span class="p">,</span> <span class="s1">&#39;tertiary&#39;</span><span class="p">,</span> <span class="s1">&#39;tertiary_link&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;Local&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;unclassified&#39;</span><span class="p">,</span><span class="s1">&#39;residential&#39;</span><span class="p">,</span><span class="s1">&#39;service&#39;</span><span class="p">,</span><span class="s1">&#39;living_street&#39;</span><span class="p">,</span><span class="s1">&#39;road&#39;</span><span class="p">,</span><span class="s1">&#39;unknown&#39;</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">iH</span> <span class="ow">in</span> <span class="n">highTypes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">iR</span> <span class="ow">in</span> <span class="n">highTypes</span><span class="p">[</span><span class="n">iH</span><span class="p">]:</span>
+                    <span class="n">roads</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">roads</span><span class="o">.</span><span class="n">highway</span><span class="o">==</span><span class="n">iR</span><span class="p">,</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iH</span>
+
+            <span class="c1"># Drop other roads</span>
+            <span class="n">roads</span> <span class="o">=</span> <span class="n">roads</span><span class="p">[</span><span class="o">~</span><span class="n">roads</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span>
+
+            <span class="c1"># Save as a feather to outPath</span>
+            <span class="n">roads</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">])</span>
+
         <span class="n">expType</span><span class="p">[</span><span class="s1">&#39;roads&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;expType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">expType</span>
+    <span class="n">printy</span><span class="p">(</span><span class="s1">&#39;Preparing exposure data done!&#39;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1821,6 +2068,61 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
 
 
 
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="volcgis.eruption.eruption.save" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outPth</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Saves eruption object to a pickle.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>outPth</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to output file. If none, saving as <code>self.name</code> in the root folder.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">outPth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Saves eruption object to a pickle.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        outPth (str): Path to output file. If none, saving as `self.name` in the root folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">outPth</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outPth</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.volc&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">outPth</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">printy</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Project saved as </span><span class="si">{</span><span class="n">outPth</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
 
 
   </div>
@@ -1910,6 +2212,78 @@ defined in <code>self.hazards[plotHazard]</code> and return a unique value</p></
     <span class="n">epsg</span> <span class="o">=</span> <span class="n">crs</span><span class="o">.</span><span class="n">to_authority</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">epsg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="volcgis.eruption.load" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Load an eruption object</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>path</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to file</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>object</code></td>
+      <td><p>A volcGIS eruption object</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>volcgis/eruption.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Load an eruption object</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): Path to file</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object: A volcGIS eruption object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E</span>
 </code></pre></div>
         </details>
     </div>

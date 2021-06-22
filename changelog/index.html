@@ -290,6 +290,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2021-06-22" class="md-nav__link">
+    2021-06-22
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-replaced-gpdclip-by-gpdsjoin" class="md-nav__link">
+    - Replaced gpd.clip() by gpd.sjoin
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2021-06-21" class="md-nav__link">
+    2021-06-21
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2021-06-15" class="md-nav__link">
     2021-06-15
   </a>
@@ -440,6 +461,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2021-06-22" class="md-nav__link">
+    2021-06-22
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-replaced-gpdclip-by-gpdsjoin" class="md-nav__link">
+    - Replaced gpd.clip() by gpd.sjoin
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2021-06-21" class="md-nav__link">
+    2021-06-21
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2021-06-15" class="md-nav__link">
     2021-06-15
   </a>
@@ -505,6 +547,14 @@
                 
                 
                 <h1 id="change-log">Change log</h1>
+<h2 id="2021-06-22">2021-06-22</h2>
+<h2 id="-replaced-gpdclip-by-gpdsjoin">- Replaced <code>gpd.clip()</code> by <code>gpd.sjoin</code></h2>
+<h2 id="2021-06-21">2021-06-21</h2>
+<ul>
+<li>Added the example for <code>PDC</code> in <code>MASTER_example.py</code> and fixed bugs</li>
+<li>Added the option for roads in <code>getExposure</code></li>
+<li>Added the exposure analysis to roads in <code>getBufferExposure</code></li>
+</ul>
 <h2 id="2021-06-15">2021-06-15</h2>
 <ul>
 <li>Fixed a problem in <code>volcgis.exposureAnalysis.getRNDS()</code> that returned wrong results without raising an error. This was due to polygons with complex shapes (e.g. holes in the polygon), which caused problem when clipping with <code>gpd</code>. The more I dug, the more I found that small hazard footprints (e.g. BAF) or those with irregular outlines (e.g. PDC) could produce "noisy" polygons at the periphery when contoured with <code>rio</code>. I added some filters, which are hopefully flexible enough to handle most case studies.</li>

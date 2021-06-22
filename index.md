@@ -25,7 +25,7 @@ conda config --env --set channel_priority strict
 Then:
 
 ```
-conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh contextily osmnx pyrosm
+conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh openpyxl contextily osmnx pyrosm tabulate
 ```
 
 ### Additional pip packages

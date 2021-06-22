@@ -591,7 +591,7 @@
 
 
 <h2 id="volcgis.exposureAnalysis.getBufferExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span></code>
+<code class="highlight language-python"><span class="n">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span> <span class="n">buildW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buildS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadL</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 
 </h2>
@@ -666,7 +666,7 @@
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">}):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getBufferExposure</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">},</span> <span class="n">buildW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buildS</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">roadL</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get exposure as concentric circles around the vent</span>
 
 <span class="sd">    Args:</span>
@@ -683,7 +683,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">bufferTot</span> <span class="o">=</span> <span class="p">{}</span>
-
+    <span class="k">if</span> <span class="n">roadL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">roadsTot</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">roadL</span><span class="p">[</span><span class="s1">&#39;highway&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
     <span class="c1"># Loop through buffers</span>
     <span class="k">for</span> <span class="n">iB</span> <span class="ow">in</span> <span class="n">buffer</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
         <span class="n">bufferTmp</span> <span class="o">=</span> <span class="p">{}</span>
@@ -703,9 +704,35 @@
             <span class="n">idx</span> <span class="o">=</span> <span class="n">LCB</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">LC</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span>
             <span class="n">bufferTmp</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
+        <span class="c1"># Buildings - added 2021-06-17</span>
+        <span class="k">if</span> <span class="n">buildW</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">build</span> <span class="o">=</span> <span class="n">buildW</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">geoms</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">buildTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">build</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="c1"># buildTmp = np.nansum(np.nansum(buildW[idx]))</span>
+            <span class="n">bufferTmp</span><span class="p">[</span><span class="s1">&#39;buildingsW&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">buildTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">buildS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">build</span> <span class="o">=</span> <span class="n">buildS</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">geoms</span><span class="o">.</span><span class="n">geometry</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">buildTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">build</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="c1"># buildTmp = np.nansum(np.nansum(buildS[idx]))</span>
+            <span class="n">bufferTmp</span><span class="p">[</span><span class="s1">&#39;buildingsS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">buildTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Roads length (in km)</span>
+        <span class="k">if</span> <span class="n">roadL</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">clipped_roads</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">roadL</span><span class="p">,</span> <span class="n">geoms</span><span class="p">)</span>
+            <span class="n">clipped_roads</span><span class="p">[</span><span class="s1">&#39;Length_m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clipped_roads</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">length</span>
+            <span class="n">roadsTmp</span> <span class="o">=</span> <span class="n">clipped_roads</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;highway&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()[[</span><span class="s1">&#39;Length_m&#39;</span><span class="p">]]</span>
+            <span class="n">roadsTot</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">roadsTmp</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="n">roadsTmp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">roadsTmp</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Length_m&#39;</span><span class="p">]</span>
+
+            <span class="c1"># for iRoads in indexRd:</span>
+            <span class="c1">#     bufferTmp[iRoads] = round(clipped_roads.loc[clipped_roads[&#39;highway&#39;]==iRoads, &#39;Length_m&#39;].sum(),0)*1e-3</span>
+
+
         <span class="n">bufferTot</span><span class="p">[</span><span class="n">iB</span><span class="p">]</span> <span class="o">=</span> <span class="n">bufferTmp</span>
 
-    <span class="k">return</span> <span class="n">bufferTot</span>
+    <span class="k">return</span> <span class="n">bufferTot</span><span class="p">,</span> <span class="n">roadsTot</span>
 </code></pre></div>
         </details>
     </div>
@@ -868,7 +895,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
 
 <h2 id="volcgis.exposureAnalysis.getExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">})</span></code>
+<code class="highlight language-python"><span class="n">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span> <span class="n">buildW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buildS</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 
 </h2>
@@ -948,7 +975,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">}):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">getExposure</span><span class="p">(</span><span class="n">haz_data</span><span class="p">,</span> <span class="n">pop_data</span><span class="p">,</span> <span class="n">LC_data</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">LC</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;crops&#39;</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;urban&#39;</span><span class="p">:</span><span class="mi">50</span><span class="p">},</span><span class="n">buildW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buildS</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This is the most basic exposure function. It compute the exposure of i) population from Landsat, </span>
 <span class="sd">            ii) urban area and iii) crop area from CGLS from a simple mask with hazard data. For the landcover </span>
 <span class="sd">            data, using `CGLS` so `urban==50` and `crops==40`.   </span>
@@ -979,6 +1006,17 @@ load_mean, load_disp, tot_rep_cost</p></td>
         <span class="c1"># Landcover / crops km2</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">LC_data</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">LC</span><span class="p">[</span><span class="n">LCi</span><span class="p">])</span>
         <span class="n">exposure</span><span class="p">[</span><span class="n">LCi</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="o">*</span><span class="n">res</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mf">1e6</span>
+
+    <span class="c1"># Buildings - added 2021-06-17</span>
+    <span class="k">if</span> <span class="n">buildW</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">buildW</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">buildTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">buildW</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+        <span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;buildingsW&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">buildTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">buildS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">haz_data</span> <span class="o">&gt;=</span> <span class="n">val</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">buildS</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">buildTmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">buildS</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+        <span class="n">exposure</span><span class="p">[</span><span class="s1">&#39;buildingsS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">buildTmp</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">exposure</span> 
 </code></pre></div>
@@ -1406,7 +1444,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
 
 <h2 id="volcgis.exposureAnalysis.updateExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">updateExposure</span><span class="p">(</span><span class="n">EXPOSURE</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">crops</span><span class="p">,</span> <span class="n">urban</span><span class="p">,</span> <span class="n">RNDS</span><span class="p">,</span> <span class="n">buildingsLoss</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">updateExposure</span><span class="p">(</span><span class="n">EXPOSURE</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">crops</span><span class="p">,</span> <span class="n">urban</span><span class="p">,</span> <span class="n">RNDS</span><span class="p">,</span> <span class="n">buildingsLoss</span><span class="p">,</span> <span class="n">buildingsW</span><span class="p">,</span> <span class="n">buildingsS</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span></code>
 
 
 </h2>
@@ -1523,7 +1561,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">updateExposure</span><span class="p">(</span><span class="n">EXPOSURE</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">crops</span><span class="p">,</span> <span class="n">urban</span><span class="p">,</span> <span class="n">RNDS</span><span class="p">,</span> <span class="n">buildingsLoss</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">updateExposure</span><span class="p">(</span><span class="n">EXPOSURE</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">crops</span><span class="p">,</span> <span class="n">urban</span><span class="p">,</span> <span class="n">RNDS</span><span class="p">,</span> <span class="n">buildingsLoss</span><span class="p">,</span> <span class="n">buildingsW</span><span class="p">,</span> <span class="n">buildingsS</span><span class="p">,</span><span class="n">radius</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates main exposure dataframe. Buildings loss is in millions.</span>
 
@@ -1559,6 +1597,9 @@ load_mean, load_disp, tot_rep_cost</p></td>
         <span class="s1">&#39;area_urban&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="n">urban</span><span class="p">],</span>
         <span class="s1">&#39;RNDS&#39;</span><span class="p">:</span>         <span class="p">[</span><span class="n">RNDS</span><span class="p">],</span>
         <span class="s1">&#39;buildingsLoss&#39;</span><span class="p">:[</span><span class="n">buildingsLoss</span><span class="p">],</span>
+        <span class="s1">&#39;buildingsW&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="n">buildingsW</span><span class="p">],</span>
+        <span class="s1">&#39;buildingsS&#39;</span><span class="p">:</span>   <span class="p">[</span><span class="n">buildingsS</span><span class="p">],</span>
+        <span class="s1">&#39;radius&#39;</span><span class="p">:</span>       <span class="p">[</span><span class="n">radius</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">expTmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">expTmp</span><span class="p">)</span>
@@ -1583,7 +1624,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
 
 <h2 id="volcgis.exposureAnalysis.updateRoadExposure" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">updateRoadExposure</span><span class="p">(</span><span class="n">roadExposure</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">roadLength</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">updateRoadExposure</span><span class="p">(</span><span class="n">roadExposure</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">roadLength</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 
 </h2>
@@ -1594,7 +1635,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
 
         <details class="quote">
           <summary>Source code in <code>volcgis/exposureAnalysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">updateRoadExposure</span><span class="p">(</span><span class="n">roadExposure</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">roadLength</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">updateRoadExposure</span><span class="p">(</span><span class="n">roadExposure</span><span class="p">,</span> <span class="n">volcano</span><span class="p">,</span> <span class="n">hazard</span><span class="p">,</span> <span class="n">VEI</span><span class="p">,</span> <span class="n">prob</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">volume</span><span class="p">,</span> <span class="n">roadLength</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates road exposure. Length is in km</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -1607,6 +1648,7 @@ load_mean, load_disp, tot_rep_cost</p></td>
         <span class="s1">&#39;mass&#39;</span><span class="p">:</span>         <span class="p">[</span><span class="n">intensity</span><span class="p">],</span>
         <span class="s1">&#39;buffer&#39;</span><span class="p">:</span>       <span class="p">[</span><span class="n">buffer</span><span class="p">],</span>
         <span class="s1">&#39;volume&#39;</span><span class="p">:</span>       <span class="p">[</span><span class="n">volume</span><span class="p">],</span>
+        <span class="s1">&#39;radius&#39;</span><span class="p">:</span>       <span class="p">[</span><span class="n">radius</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="n">expTmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">expTmp</span><span class="p">)</span>
@@ -1702,7 +1744,7 @@ file so only one join is required.</p>
     <span class="k">if</span> <span class="n">RSDS</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">RSDS</span> <span class="o">=</span> <span class="n">rsds_tmp</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">RSDS</span> <span class="o">=</span> <span class="n">RSDS</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rsds_tmp</span><span class="p">)</span>
+        <span class="n">RSDS</span> <span class="o">=</span> <span class="n">RSDS</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rsds_tmp</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">RSDS</span>
 </code></pre></div>

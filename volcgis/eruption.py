@@ -4,7 +4,7 @@ import geopandas as gpd
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
-from shapely.geometry import box
+from shapely.geometry import box, Polygon, shape
 from fiona.crs import from_epsg
 # import osmnx as ox
 # from osgeo import gdal
@@ -95,7 +95,7 @@ class eruption:
         for iB in bufList:
             buffer = buffer.append(gdf.geometry.buffer(iB*1e3).rename(iB))
         buffer.columns = ['geometry']
-        self.buffer = buffer
+        self.buffer = gpd.GeoDataFrame(buffer, geometry='geometry', crs=self.EPSG_proj)
         
         # Create an empty dictionary to store hazard information
         self.hazards = {}
@@ -125,7 +125,7 @@ class eruption:
         printy(f"Project saved as {outPth}")
             
     def prepareExposure(self, population=True, landcover=True, roads=True, populationInt='nearest', landcoverInt='nearest',
-                        populationRes=1000, landcoverRes=100, populationScaling=True):
+                        populationRes=1000, landcoverRes=100, populationScaling=True, noOSM=False):
         """ Prepares datasets for exposure analysis.
             Args:
                 population (bool): Process population data
@@ -136,11 +136,14 @@ class eruption:
                 populationRes (int): Original resolution of population data
                 landcoverRes (int): Original resolution of landcover data
                 populationScaling (bool): Corrects for the change in pixel resolution of population count data
+                noOSM (bool): For debug
         """
         
+        printy('Preparing exposure data...')
         expType = {}
         
         if population:
+            printy('\t Population count...')
             self.path['pop_count'] = os.path.join(self.path['outPath'], self.name, '_data', 'population.tif')
             profile = self.alignRaster(self.path['populationPath'], self.path['pop_count'], resampling=populationInt)
             
@@ -160,64 +163,71 @@ class eruption:
             expType['pop_count'] = 1
             
         if landcover:
+            printy('\t Land cover...')
             self.path['LC_class'] = os.path.join(self.path['outPath'], self.name, '_data', 'landcover.tif')
             self.alignRaster(self.path['landcoverPath'], self.path['LC_class'], resampling=landcoverInt)
             expType['LC_class'] = 1
             
         if roads:
+            printy('\t OSM...')
             # Set path
             inPoly = os.path.join(self.path['outPath'], self.name, '_data', 'poly.poly')
             self.path['roads'] = os.path.join(self.path['outPath'], self.name, '_data', 'roads.feather')
             outPathTmp = os.path.join(self.path['outPath'], self.name, '_tmp', 'roads.pbf')
-            # Get AOI extent
-            coor = list(self.areaG.iloc[0].geometry.exterior.coords)
-            if os.path.exists(inPoly):
-                os.remove(inPoly)
-            with open(inPoly,'a') as fl:
-                fl.write(f'{self.name}\n')
-                fl.write(f'Poly\n')
-                for c in coor:
-                    fl.write(f'\t{c[0]} {c[1]}\n')
-                fl.write(f'END\n')
-                fl.write(f'END\n')
-    
-            # Clip with OSMOSIS
-            osmosis = f"osmosis --read-pbf file={os.path.abspath(self.path['OSMroadsPath'])} --bounding-polygon file={os.path.abspath(inPoly)} --write-pbf file={os.path.abspath(outPathTmp)}"
-            printy('\t...clipping OSM data, which can take a few minutes...')
-            os.system(osmosis)
-            printy('\t...clipping done!')
-            
-            # Extract data from OSM
-            osm = OSM(outPathTmp)
-            printy('\t...extracting the road network...')
-            roads = osm.get_network(network_type="driving")
-            printy('\t...extracting done!')
-            roads = roads[['highway', 'id', 'geometry']].dropna(how='all')
-            # Reproject
-            roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
-            
-            # Extract only the main roads
-            highTypes = {
-                'Motorway': ['motorway', 'motorway_link'],
-                'Arterial': ['trunk', 'trunk_link', 'primary', 'primary_link'],
-                'Collector': ['secondary', 'secondary_link', 'tertiary', 'tertiary_link'],
-                'Local': ['unclassified','residential','service','living_street','road','unknown'],
-            }
-            for iH in highTypes.keys():
-                for iR in highTypes[iH]:
-                    roads.loc[roads.highway==iR,'class'] = iH
-            
-            # Drop other roads
-            roads = roads[~roads['class'].isnull()]
-            
-            # Save as a feather to outPath
-            roads.to_feather(self.path['roads'])
+                
+            if not noOSM:
+                # Get AOI extent
+                coor = list(self.areaG.iloc[0].geometry.exterior.coords)
+                if os.path.exists(inPoly):
+                    os.remove(inPoly)
+                with open(inPoly,'a') as fl:
+                    fl.write(f'{self.name}\n')
+                    fl.write(f'Poly\n')
+                    for c in coor:
+                        fl.write(f'\t{c[0]} {c[1]}\n')
+                    fl.write(f'END\n')
+                    fl.write(f'END\n')
+        
+                # Clip with OSMOSIS
+                osmosis = f"osmosis --read-pbf file={os.path.abspath(self.path['OSMroadsPath'])} --bounding-polygon file={os.path.abspath(inPoly)} --write-pbf file={os.path.abspath(outPathTmp)}"
+                printy('\t...clipping OSM data, which can take a few minutes...')
+                os.system(osmosis)
+                printy('\t...clipping done!')
+                
+                # Extract data from OSM
+                osm = OSM(outPathTmp)
+                printy('\t...extracting the road network...')
+                roads = osm.get_network(network_type="driving")
+                printy('\t...extracting done!')
+                roads = roads[['highway', 'id', 'geometry']].dropna(how='all')
+                # Reproject
+                roads = roads.to_crs(crs="EPSG:{}".format(self.EPSG))
+                
+                # Extract only the main roads
+                highTypes = {
+                    'Motorway': ['motorway', 'motorway_link'],
+                    'Arterial': ['trunk', 'trunk_link', 'primary', 'primary_link'],
+                    'Collector': ['secondary', 'secondary_link', 'tertiary', 'tertiary_link'],
+                    'Local': ['unclassified','residential','service','living_street','road','unknown'],
+                }
+                for iH in highTypes.keys():
+                    for iR in highTypes[iH]:
+                        roads.loc[roads.highway==iR,'class'] = iH
+                
+                # Drop other roads
+                roads = roads[~roads['class'].isnull()]
+                
+                # Save as a feather to outPath
+                roads.to_feather(self.path['roads'])
 
             expType['roads'] = 1
             
         self.exposure['expType'] = expType
-    
-    def getHazardExposure(self, hazard, hazardProps, LC={'crops':40, 'urban':50}):
+        printy('Preparing exposure data done!')
+        
+    def getHazardExposure(self, hazard, hazardProps, LC={'crops':40, 'urban':50}, minArea=5):
+        
+        printy(f'Computing the exposure for {hazard}...')
         
         columns = hazardProps['columns'] + [hazardProps['varName']]
         
@@ -231,17 +241,31 @@ class eruption:
             columns = columns + list(LC.keys())
             LC_class = True
             
+        if 'roads' in self.exposure['expType'].keys():
+            road_data = gpd.read_feather(self.path['roads'])
+            indexRd = list(road_data['class'].unique())
+            columns = columns + indexRd
+            road_length = True
+            printy(f' - The road network will be analysed, this can take a while...')
+                        
         exposure = pd.DataFrame(columns=columns)
         
         hazPath = os.path.join(self.path['outPath'], self.name, '_hazard', hazard)
         
         # Loop through hazard files
         for i in range(0,self.hazards[hazard]['data'].shape[0]):
-            haz_data = xio.open_rasterio(self.checkHazPath(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth'])))
-
+            fl = self.checkHazPath(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth']))
+            printy(f" - Analysing {fl}...")
+            haz_data = xio.open_rasterio(fl)
+            
+            # This is a bit slow - re-opening the file a second time with rasterio to be able to use the features.shape()
+            # library.
+            haz_shp = rio.open(fl)
+            haz_mask = np.squeeze(haz_shp.read())
+            
             # Loop through the thresholds
             for iT in hazardProps['varVal']:
-
+                printy(f"\t ...extracting exposure for value {iT}")
                 # Create dictionary to update the exposure dataframe
                 exposureTmp = {}
                 exposureTmp[hazardProps['varName']] = iT
@@ -259,6 +283,33 @@ class eruption:
                     for LCi in LC.keys():
                         idx = (haz_data >= iT) & (LC_data.data[0]==LC[LCi])
                         exposureTmp[LCi] = np.round(np.sum(idx.data[0])*(self.res**2)/1e6,0)
+                    
+                # Roads length (in km)
+                if road_length:
+                    # Create a mask
+                    mask = haz_mask >= iT
+                    mask = mask.astype('uint8')
+
+                    # Extract geometry from shapes
+                    shapes = rio.features.shapes(mask, transform=haz_shp.transform)
+                    geometry = []
+                    for shapedict, value in shapes:
+                        if value == 1:
+                            # This makes sure there is no hole in the polygon ane that all polygons are valid
+                            # This slows down the processes significantly 
+                            shp = shape(shapedict)
+                            if shp.area>=(minArea*self.res**2):
+                                geometry.append(Polygon(list(shp.buffer(self.res).exterior.coords)))
+
+                    geom = gpd.GeoDataFrame(geometry=geometry, crs=self.EPSG_proj)
+                    clipped_roads = gpd.sjoin(road_data, geom)
+                    clipped_roads.drop('index_right', axis=1, inplace=True)
+                    if len(geometry)>1:
+                        print('Warning: contouring the raster resuted in more than one polygon')
+                    clipped_roads['length'] = clipped_roads.geometry.length
+                    for iRoads in indexRd:
+                        exposureTmp[iRoads] = round(clipped_roads.loc[clipped_roads['class']==iRoads, 'length'].sum(),0)*1e-3
+
                 
                 # Update exposure
                 exposure = exposure.append(
@@ -291,7 +342,6 @@ class eruption:
             LC_class = True
             
         if 'roads' in self.exposure['expType'].keys():
-            LC_data = xio.open_rasterio(self.\path['LC_class'])
             road_data = gpd.read_feather(self.path['roads'])
             indexRd = list(road_data['class'].unique())
             index = index + indexRd
@@ -321,8 +371,10 @@ class eruption:
                     
             # Roads length (in km)
             if road_length:
-                clipped_roads = gpd.clip(road_data, geoms)
+                clipped_roads = gpd.sjoin(road_data, geoms)
+                clipped_roads.drop('index_right', axis=1, inplace=True)
                 clipped_roads['length'] = clipped_roads.geometry.length
+                
                 for iRoads in indexRd:
                     buffer.loc[iRoads, iB] = round(clipped_roads.loc[clipped_roads['class']==iRoads, 'length'].sum(),0)*1e-3
 
@@ -504,7 +556,8 @@ class eruption:
 
         return vrt_options
     
-    def plot(self, plotExposure=None, plotBuffer=None, plotHazard=None, plotContours=True, hazLevels=None, hazProps=None, LC={'crops':40, 'urban':50}, figsize = [8,5]):
+    def plot(self, plotExposure=None, plotBuffer=None, plotHazard=None, plotContours=True, hazLevels=None, hazProps=None, 
+             LC={'crops':40, 'urban':50}, figsize = [10,7], roadType=None, roadColor=None, roadThick=None):
         """ Plot exposure on a map
         
             Args:
@@ -517,6 +570,9 @@ class eruption:
                     defined in `self.hazards[plotHazard]` and return a unique value
                 LC (dict): Dictionary containing `'class_name': class_val`
                 figsize (list[float]): Figure size
+                roadType (list[str]): List of road classes to plot. If `None`, `roadType` = ['Collector', 'Arterial', 'Motorway']. If `'all'`, `roadType` = ['Local', 'Collector', 'Arterial', 'Motorway']
+                roadColor (dict): Dictionary of road colors to plot. Keys must be equal to `roadType`. If None, `roadColor` = {'Local': '#f768a1', 'Collector': '#dd3497', 'Arterial': '#ae017e', 'Motorway': '#7a0177'}]
+                roadThick (dict): Dictionary of road thicknesses to plot. Keys must be equal to `roadType`. If None, `roadThick` = {'Local': .5, 'Collector': 1, 'Arterial': 1.5, 'Motorway': 2.3}]
 
         """
         fig = plt.figure(figsize=figsize)
@@ -550,6 +606,42 @@ class eruption:
             LCplt = LC_data.where(idx).plot(cmap='Set1', alpha=.5, ax=ax, cbar_kwargs={'label': 'Landcover'}, levels=len(list(LC.values()))+1 )#, levels=list(LC.values()))#, vmin=min(list(LC.values())), vmax=max(list(LC.values())))
             LCplt.colorbar.set_ticks(list(LC.values()))
             LCplt.colorbar.set_ticklabels(list(LC.keys()))
+        
+        # Plot roads
+        elif plotExposure in ['roads', 'Roads']:
+            printy("Plotting the road network can be long, don't complain if that crashes your computer!")
+            road_data = gpd.read_feather(self.path['roads'])
+            # road_data = gpd.clip(road_data, E.buffer.loc[25].geometry) # for debug
+            # Reproject
+            road_data = road_data.to_crs(self.EPSG_geo)
+            
+            # fig = plt.figure(figsize=figsize)
+            # ax = fig.add_subplot(1, 1, 1)
+            # E.areaG.plot(facecolor="none", edgecolor="black",alpha=0.5,ax=ax)
+            
+            # Setup road design
+            if roadType == None:
+                roadType = ['Collector', 'Arterial', 'Motorway']
+            elif roadType == 'all':
+                roadType = ['Local', 'Collector', 'Arterial', 'Motorway']
+
+            if roadColor == None:
+                roadColor = {'Local': '#f768a1',
+                            'Collector': '#dd3497',
+                            'Arterial': '#ae017e',
+                            'Motorway': '#7a0177'}
+            if roadThick == None:
+                roadThick = {'Local': .5,
+                            'Collector': 1,
+                            'Arterial': 1.5,
+                            'Motorway': 2.3}
+            # Plot the different road classes
+            for iR in roadType:
+                roadTmp = road_data.loc[road_data['class'] == iR]
+                if roadTmp.shape[0]>0:
+                    roadTmp.plot(ax=ax, colors=roadColor[iR], linewidth=roadThick[iR])
+
+                
             
         # Plot buffer
         if plotBuffer:

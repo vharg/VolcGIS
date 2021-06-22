@@ -31,7 +31,6 @@ res = 250
 # We now define an eruption/volcano object and plot the study area.
 
 # %%
-
 # Setup eruption dictionary. The extent defines the coverage of the study area. It can be specified either in *absolute* UTM coordinates or as a *relative* distance from the vent. The behaviour is controlled below.
 eruption = {
     'name':     name,
@@ -52,7 +51,7 @@ path = {
 E = volcgis.eruption.eruption(eruption, res, path, extent='relative', buffer=[10,25,40])
 
 # We can now plot the study area and, as an option, add the concentric circles with `plotBuffer`. In this case, it is obvious that the 100 km buffer is outside the study area - that is something one should pay attention to.
-E.plot(plotBuffer=True)
+# E.plot(plotBuffer=True)
 
 #%% [markdown]
 # ### Note on the use of OSM data
@@ -67,29 +66,24 @@ E.plot(plotBuffer=True)
 # We first need a `nameConstructor` dictionary to retrieve hazard model outputs. This is used to reconstruct the file names in a modular way, where each subcomponent is separated by an underscore `_`. In the case of the tephra example below, it will gather all these files:
 # 
 # ```
-#  Merapi_VEI3_P1.tif
-#  Merapi_VEI3_P5.tif
-#  Merapi_VEI3_P9.tif
-#  Merapi_VEI4_P1.tif
-#  Merapi_VEI4_P5.tif
-#  Merapi_VEI4_P9.tif
-#  Merapi_VEI5_P1.tif
-#  Merapi_VEI5_P5.tif
-#  Merapi_VEI5_P9.tif
+#  Merapi_VEI3_P50.tif
+#  Merapi_VEI3_P90.tif
+#  Merapi_VEI4_P50.tif
+#  Merapi_VEI4_P90.tif
 # ```
 
 # %%
 # Tephra hazard
 nameConstructorTephra = {
     'volcano':    ['Merapi'],
-    'VEI':        ['VEI3', 'VEI4', 'VEI5'],
-    'prob':       ['P10', 'P50', 'P90'],
+    'VEI':        ['VEI3', 'VEI4'],
+    'prob':       ['P50', 'P90'],
     'format':     ['.tif']
 }
 # PDC hazard
 nameConstructorPDC = {
     'volcano':    ['Merapi'],
-    'VEI':        ['3', '4', '5'],
+    'VEI':        ['3', '4'],
     'suffix':     ['output_map'],
     'format':     ['.asc']
 }
@@ -100,6 +94,7 @@ nameConstructorPDC = {
 # - `epsg` as the int code of the original coordinate system of the hazard files and 
 # - `roodDir` as the directory where the files are located
 
+#%%
 tephra = {
     'hazard':   'Tephra',
     'epsg':     epsg,
@@ -124,7 +119,6 @@ PDC = {
 # 3. Saves the file in `E.path['outPath']`/`E.name`/_hazard/`tephra['hazard']`
 # 
 # Use `noAlign=True` to skip the align part - which should only be used in debug mode. 
-# 
 
 # %%
 E.prepareHazard(tephra, noAlign=True)
@@ -137,7 +131,7 @@ E.prepareHazard(PDC, noAlign=True)
 # 1. Only keep the digit of the `VEI` column
 # 2. In this case the `perc` column represents a percentile rank, which we want to convert in a survivor function
 # 3. Dropping the column `format`
-#
+
 # %%
 tmp = E.hazards['Tephra']['data']
 tmp['VEI'] = tmp['VEI'].str.extract('(\d+)').astype(int)
@@ -158,8 +152,8 @@ E.hazards['PDC']['data'] = E.hazards['PDC']['data'].drop(['suffix', 'format'], a
 # We can now plot the hazard on a map. `plotHazard` controls type of hazard to plot - which must correspond to an entry in `E.hazards`. `plotHazard` requires two additional arguments: `hazLevels` - which is a list containing the raster values to contour and `hazProps` - which is a dictionary that will control what hazard file to plot. Each pair of key/value must correspond to the columns defined in `E.hazards[plotHazard]` and return a unique value.
 
 # %%
-E.plot(plotHazard='Tephra', hazLevels=[1,10,100,300], hazProps={'VEI': 5,'prob': 90})
-E.plot(plotHazard='PDC', hazLevels=[0.1, 0.5, 0.9], hazProps={'VEI': 4})
+# E.plot(plotHazard='Tephra', hazLevels=[1,10,100,300], hazProps={'VEI': 5,'prob': 90})
+# E.plot(plotHazard='PDC', hazLevels=[0.1, 0.5, 0.9], hazProps={'VEI': 4})
 
 # %% [markdown]
 # #### Knowing the data
@@ -198,7 +192,6 @@ LC = {
     'urban':50
     }
 
-
 # %%
 # We then feed it to `E.getBufferExposure()`:
 E.getBufferExposure(LC=LC)
@@ -217,13 +210,13 @@ sns.barplot(x=E.exposure['buffer'].columns, y=E.exposure['buffer'].loc['pop_coun
 TephraProps= {
     'columns':  ['VEI', 'prob'],
     'varName':  'massT',
-    'varVal':   [1,5,10,50,100]
+    'varVal':   [1,10,100]
 }
 
 PDCProps= {
     'columns':  ['VEI'],
     'varName':  'prob',
-    'varVal':   [.1, .5, .9]
+    'varVal':   [.25, .5, .25]
 }
 
 # %% [markdown]
@@ -232,7 +225,7 @@ PDCProps= {
 # %%
 E.getHazardExposure('Tephra', TephraProps)
 E.getHazardExposure('PDC', PDCProps)
-
+           
 # %% [markdown]
 # The associated exposure data is now recorded in `E.exposure['Tephra']`. Let's plot the population exposure to 1 kg/m2, comparing VEIs and probabilities of occurrence:
 
@@ -242,13 +235,14 @@ data = data[data.massT == 1]
 g = sns.FacetGrid(data, col="VEI")
 g.map(sns.barplot, "prob", 'pop_count', order=[10,50,90])
 
+print(data.head(10).to_markdown())
+
 # %% [markdown]
 # ## Plotting maps
 # We can now combine exposure and hazards on one map
 
 # %%
 E.plot(plotExposure='pop', plotBuffer=True, plotHazard='Tephra', hazLevels=[1,10,25,50,100], hazProps={'VEI': 4,'prob': 50})
-E.plot(plotExposure='LC', plotBuffer=True, plotHazard='Tephra', hazLevels=[1,10,100,300], hazProps={'VEI': 5,'prob': 90})
 E.plot(plotExposure='LC', plotBuffer=True, plotHazard='PDC', hazLevels=[.1, .5, .9], hazProps={'VEI': 4})
 
 # %% [markdown]
@@ -256,10 +250,10 @@ E.plot(plotExposure='LC', plotBuffer=True, plotHazard='PDC', hazLevels=[.1, .5, 
 # We can now save the result to a file. By default, the project is saved to `E.name` in the root folder.
 
 #%%
-E.save()
+E.save(outPth='volcanoes/Merapi/Merapi.volc')
 
 # %% [markdown]
 # This project can now be loaded as such:
 
 #%%
-E = volcgis.eruption.load('Merapi.volc')
+E = volcgis.eruption.load('volcanoes/Merapi/Merapi.volc')

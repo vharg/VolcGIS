@@ -2,7 +2,7 @@
 
 Welcome to the documentation page for **VolcGIS**!
 
-**VolcGIS** is a Python package that implements several functions for exposure analyses to volcanic hazards. It is developed by the *Volcanic Hazards and Risk Group* group at the Earth Observatory of Singapore, Nanyang Technological University. In a nutshell, **VolcGIS** provides high-level functions to streamline the process of:
+**VolcGIS** is a Python package that implements several functions for exposure analyses to volcanic hazards. It is developed by the [Volcanic Hazards and Risk Group](https://www.earthobservatory.sg/research-group/volcanic-hazards-and-risk-susanna-jenkins) group at the [Earth Observatory of Singapore](https://www.earthobservatory.sg), Nanyang Technological University. In a nutshell, **VolcGIS** provides high-level functions to streamline the process of:
 
 - Setting up a GIS to fully exploit the spatial relationship between hazard and exposure datasets
 - Pre-process hazard and exposure datasets
@@ -25,7 +25,7 @@ conda config --env --set channel_priority strict
 Then:
 
 ```
-conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh contextily osmnx pyrosm
+conda install -c conda-forge pyarrow rioxarray rasterio geopandas bokeh openpyxl contextily osmnx pyrosm tabulate
 ```
 
 ### Additional pip packages
@@ -56,5 +56,3 @@ As a caveat, a critical interpretation of the results is required. Although not 
 ## License
 
 **VolcGIS** is published under a GNU GPL v3 License
-
-## Content

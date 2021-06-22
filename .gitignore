@@ -5,6 +5,7 @@
 *.gpkg
 *.feather
 *.qgz
+*.volc
 hazards/
 volcanoes/
 gede/

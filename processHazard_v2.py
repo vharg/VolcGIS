@@ -7,11 +7,12 @@ from volcgis.exposureAnalysis import *
 from volcgis import eruption
 from rasterio.plot import show
 import rasterio as rio
+from rasterio import features
 import rioxarray as xrio
 import pandas as pd
 from pyproj import CRS
 from pyproj import Transformer
-import numpy as np
+import numpy as npp
 # import utm
 from printy import printy
 # import fiona
@@ -55,9 +56,10 @@ processRoadNetwork = False
 processBuildings = False
 
 analyzeTephra = False
-analyzeBAF = True
+analyzeBAF = False
 analyzePDC = True
-analyzeLC = True
+analyzeLC = False
+analyzeBuffer = True
 
 # Main loops for processing
 VEI = [3,4,5]
@@ -65,6 +67,7 @@ probT = [10,50,90]
 intT = [1,5,50,100]
 buffT = ['300', '990']
 volT = ['9800000', '450000']
+radii = [10,30,100]
 
 # Dictionaries for road disruption
 RNDS_intensity_map = {1: 10,
@@ -234,7 +237,7 @@ for i in rng:
     buildSf = os.path.join(erup.path['outPath'], erup.name, '_data/buildings_strong.tif')
     
     # If any exposure analysis is required, load the data
-    if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
+    if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra, analyzeBuffer]):
 
         # Read datasets
         # LC = rio.open(LCf)
@@ -275,15 +278,20 @@ for i in rng:
                 # In case of tephra, need to concatenate the rsds for various columns/accumulations into one. Cat, rename and drop
                 
                 # Test to handle problems on Gekko
-                if 'RSDS_100' not in rsds.columns:
-                    rsds['RSDS_100'] = 0
-                if 'RSDS_1' not in rsds.columns:
-                    rsds['RSDS_1'] = 0
+                # if 'RSDS_100' not in rsds.columns:
+                #     rsds['RSDS_100'] = 0
+                # if 'RSDS_1' not in rsds.columns:
+                #     rsds['RSDS_1'] = 0
                 
-                rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = rsds.RSDS_100.fillna(0)+rsds.RSDS_1.fillna(0)
+                if 'RSDS' not in rsds.columns:
+                    rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = 0
+                else:
+                    rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = rsds['RSDS']
+                # rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))] = rsds.RSDS_100.fillna(0)+rsds.RSDS_1.fillna(0)
                 rsds = rsds[rsds.columns.drop(list(rsds.filter(regex='RSDS')))]
+                # print(rsds['tephra_VEI{}_P{}'.format(iVEI, int(100-iP))].unique())
                 RSDS = updateRSDS(RSDS, rsds)
-                
+
                 # Compute exposure from Landscan and landcover
                 with rio.open(fl) as haz:
                     haz_data = haz.read(1)
@@ -298,15 +306,15 @@ for i in rng:
                     damageRatio, damageState = updateBuildingExposure(damageRatio,damageState,erup.name,iVEI, iP, 'strong', DRs, DSs)
                     
                     # General exposure
-                    exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, None, None, None, None, None, None, rnds, round((DRs.loss.sum()+DRw.loss.sum())/1e6,2))
+                    exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, None, None, None, None, None, None, rnds, round((DRs.loss.sum()+DRw.loss.sum())/1e6,2), None, None,None)
                     
                     for iM in intT:
-                        exposureTmp = getExposure(haz_data, pop, LC, res, iM)
+                        exposureTmp = getExposure(haz_data, pop, LC, res, iM, buildW=buildW_data, buildS=buildS_data)
                         
                         # If the value of iM is found in roadLength, then add the value of roadLength to exposure
                         if iM in roadLength.columns:
                             roadExposure = updateRoadExposure(roadExposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, roadLength[[iM]])
-                        exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], None, None)
+                        exposure = updateExposure(exposure, erup.name, 'Tephra', iVEI, iP, iM, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], None, None, exposureTmp['buildingsW'], exposureTmp['buildingsS'],None)
     
     if analyzeBAF:
         printy(' - Processing BAF...')
@@ -330,8 +338,8 @@ for i in rng:
                 with rio.open(fl) as haz:
                     haz_data = haz.read(1)
                     for iP in probT:
-                        exposureTmp = getExposure(haz_data, pop, LC, res, iP/100)
-                        exposure = updateExposure(exposure, erup.name, 'BAF', None, iP, None, iB, iV, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], rnds[iP/100], None)
+                        exposureTmp = getExposure(haz_data, pop, LC, res, iP/100, buildW=buildW_data, buildS=buildS_data)
+                        exposure = updateExposure(exposure, erup.name, 'BAF', None, iP, None, iB, iV, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], rnds[iP/100], None, exposureTmp['buildingsW'], exposureTmp['buildingsS'],None)
                         roadExposure = updateRoadExposure(roadExposure, erup.name, 'BAF', None, iP, None, iB, iV, roadLength[[iP/100]])
 
     if analyzePDC:
@@ -355,8 +363,8 @@ for i in rng:
             with rio.open(fl) as haz:
                 haz_data = haz.read(1)
                 for iP in probT:
-                    exposureTmp = getExposure(haz_data, pop, LC, res, iP/100)
-                    exposure = updateExposure(exposure, erup.name, 'PDC', iVEI, iP, None, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], rnds[iP/100], None)
+                    exposureTmp = getExposure(haz_data, pop, LC, res, iP/100, buildW=buildW_data, buildS=buildS_data)
+                    exposure = updateExposure(exposure, erup.name, 'PDC', iVEI, iP, None, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], rnds[iP/100], None, exposureTmp['buildingsW'], exposureTmp['buildingsS'],None)
                     roadExposure = updateRoadExposure(roadExposure, erup.name, 'PDC', iVEI, iP, None, None, None, roadLength[[iP/100]])
     
     if analyzeLC: 
@@ -365,12 +373,28 @@ for i in rng:
             printy('   - VEI: {}...'.format(iVEI))
             # Define hazard file
             fl = os.path.join(erup.path['outPath'], erup.name, '_hazard/LC/{}_VEI{}.tif'.format(erup.name, iVEI))
+            _, roadLength, _  = getRNDS(fl, RNDS_probability_map, road, epsg, intensity=False)
             with rio.open(fl) as haz:
                 haz_data = haz.read(1)
                 for iP in probT:
-                    exposureTmp = getExposure(haz_data, pop, LC, res, iP/100)
-                    exposure = updateExposure(exposure, erup.name, 'LC', iVEI, iP, None, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], None, None)
+                    exposureTmp = getExposure(haz_data, pop, LC, res, iP/100, buildW=buildW_data, buildS=buildS_data)
+                    exposure = updateExposure(exposure, erup.name, 'LC', iVEI, iP, None, None, None, exposureTmp['pop_count'], exposureTmp['crops'], exposureTmp['urban'], None, None, exposureTmp['buildingsW'], exposureTmp['buildingsS'],None)
+                    roadExposure = updateRoadExposure(roadExposure, erup.name, 'LC', iVEI, iP, None, None, None, roadLength[[iP/100]])
+                    
+    if analyzeBuffer: 
+        printy(' - Processing buffer...')
+        exposureTmp, roadsTot = getBufferExposure(erup.buffer, pop, LC, res, buildW=buildW, buildS=buildS, roadL=road)
 
+        for iB in exposureTmp.keys():
+            exposure = updateExposure(exposure, erup.name, 'BUF', None, None, None, None, None, exposureTmp[iB]['pop_count'], exposureTmp[iB]['crops'], exposureTmp[iB]['urban'], None, None, exposureTmp[iB]['buildingsW'], exposureTmp[iB]['buildingsS'],iB)
+            roadExposure = updateRoadExposure(roadExposure, erup.name, 'BUF', None, None, None, None, None, roadsTot[[iB]], iB)
+
+        # for iR in exposureTmp
+        #     # mask = features.rasterize(erup.buffer.loc[iR],out=pop.data, transform=pop.rio.transform())
+        #     mask = features.rasterize(erup.buffer.loc[iR],out_shape=np.squeeze(pop.data).shape)
+        #     # mask[mask<0] = 0
+        #     # mask[mask>0] = 1
+            
     if any([analyzeBAF, analyzeLC, analyzePDC, analyzeTephra]):
         # Close connection to rasters
         LC.close()
@@ -386,8 +410,6 @@ for i in rng:
     toc = time.perf_counter() # Stop counter
     print(f" Time: {toc - tic:0.0f} seconds")
 # EXPOSURE.to_csv('results.csv')
-
-
 
 
 # %% Debug

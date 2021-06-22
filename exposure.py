@@ -36,7 +36,7 @@ def wgs84_to_web_mercator(df, lon="lon", lat="lat"):
 #%%
 
 # Prepare exposure data 
-ALL = pd.read_csv('MASTER_exposure.csv')
+ALL = pd.read_csv('csv/MASTER_exposure_v2.csv')
 ALL = ALL.drop(['Unnamed: 0'], axis=1)
 ALL = ALL.rename({'pop_count': 'Population', 'area_crops': 'Crops', 'area_urban': 'Urban', 'buildingsLoss': 'Buildings'}, axis=1)
 ALL = ALL[ALL.month==0] # No seasonal analysis

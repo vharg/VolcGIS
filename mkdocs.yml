@@ -12,18 +12,25 @@ theme:
   icon:
     repo: fontawesome/brands/github
   palette:
-    scheme: slate
-    accent: pink
+    - scheme: default
+      accent: deep orange
+      primary: blue grey
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      accent: deep orange
+      primary: blue grey
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
 
 nav:
   - Home: index.md
   - Demo: MASTER_example.py
-  # - Getting started:
-  #   - Install: install.md
-    # - Tips: tips.md
-    # - Changelog: changelog.md
+  - Changelog: changelog.md
+  - Tips: tips.md
   - volcGIS API:
-    # - Main module: volcGIS.md
     - Module eruption: volcGIS_eruption.md
     - Module exposureAnalysis: volcGIS_exposureAnalysis.md
 
@@ -37,6 +44,13 @@ plugins:
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
+
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/VolcanoRisk
+    - icon: fontawesome/brands/github
+      link: https://github.com/vharg
 
 extra_css:
   - stylesheets/extra.css

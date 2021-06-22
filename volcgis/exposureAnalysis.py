@@ -45,11 +45,11 @@ def updateRSDS(RSDS, rsds):
     if RSDS.shape[0] == 0:
         RSDS = rsds_tmp
     else:
-        RSDS = RSDS.join(rsds_tmp)
+        RSDS = RSDS.join(rsds_tmp, how='outer')
         
     return RSDS
         
-def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volume, pop, crops, urban, RNDS, buildingsLoss):
+def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volume, pop, crops, urban, RNDS, buildingsLoss, buildingsW, buildingsS,radius):
     """
         Updates main exposure dataframe. Buildings loss is in millions.
         
@@ -85,6 +85,9 @@ def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volu
         'area_urban':   [urban],
         'RNDS':         [RNDS],
         'buildingsLoss':[buildingsLoss],
+        'buildingsW':   [buildingsW],
+        'buildingsS':   [buildingsS],
+        'radius':       [radius],
     }
 
     expTmp = pd.DataFrame(expTmp)
@@ -97,7 +100,7 @@ def updateExposure(EXPOSURE, volcano, hazard, VEI, prob, intensity, buffer, volu
     
     return EXPOSURE.append(expTmp)
 
-def updateRoadExposure(roadExposure, volcano, hazard, VEI, prob, intensity, buffer, volume, roadLength):
+def updateRoadExposure(roadExposure, volcano, hazard, VEI, prob, intensity, buffer, volume, roadLength, radius=None):
     """
         Updates road exposure. Length is in km
     """
@@ -110,6 +113,7 @@ def updateRoadExposure(roadExposure, volcano, hazard, VEI, prob, intensity, buff
         'mass':         [intensity],
         'buffer':       [buffer],
         'volume':       [volume],
+        'radius':       [radius],
     }
 
     expTmp = pd.DataFrame(expTmp)
@@ -147,7 +151,7 @@ def updateBuildingExposure(damageRatio, damageState, volcano, VEI, prob, typ, DR
 
     return damageRatio.append(DR), damageState.append(DS)
 
-def getExposure(haz_data, pop_data, LC_data, res, val, LC={'crops':40, 'urban':50}):
+def getExposure(haz_data, pop_data, LC_data, res, val, LC={'crops':40, 'urban':50},buildW=None, buildS=None):
     """ This is the most basic exposure function. It compute the exposure of i) population from Landsat, 
             ii) urban area and iii) crop area from CGLS from a simple mask with hazard data. For the landcover 
             data, using `CGLS` so `urban==50` and `crops==40`.   
@@ -179,9 +183,20 @@ def getExposure(haz_data, pop_data, LC_data, res, val, LC={'crops':40, 'urban':5
         idx = (haz_data >= val) & (LC_data.data[0]==LC[LCi])
         exposure[LCi] = np.sum(idx)*res**2/1e6
 
+    # Buildings - added 2021-06-17
+    if buildW is not None:
+        idx = (haz_data >= val) & (buildW > 0)
+        buildTmp = np.nansum(np.nansum(buildW[idx]))
+        exposure['buildingsW'] = round(buildTmp,0)
+        
+    if buildS is not None:
+        idx = (haz_data >= val) & (buildS > 0)
+        buildTmp = np.nansum(np.nansum(buildS[idx]))
+        exposure['buildingsS'] = round(buildTmp,0)
+        
     return exposure 
 
-def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50}):
+def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50}, buildW=None, buildS=None, roadL=None):
     """ Get exposure as concentric circles around the vent
     
     Args:
@@ -198,11 +213,12 @@ def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50
     """
 
     bufferTot = {}
-
+    if roadL is not None:
+        roadsTot = pd.DataFrame(index=list(roadL['highway'].unique()), columns=buffer.index.values)
     # Loop through buffers
     for iB in buffer.index.values:
         bufferTmp = {}
-        
+
         # Create GDF for clipping
         geoms = gpd.GeoDataFrame(buffer.loc[[iB]])
 
@@ -218,9 +234,35 @@ def getBufferExposure(buffer, pop_data, LC_data, res, LC={'crops':40, 'urban':50
             idx = LCB.data[0]==LC[LCi]
             bufferTmp[LCi] = round(np.sum(idx)*res**2/1e6,0)
 
+        # Buildings - added 2021-06-17
+        if buildW is not None:
+            build = buildW.rio.clip(geoms.geometry)
+            idx = build.data[0] > 0
+            buildTmp = np.nansum(np.nansum(build.where(idx).data[0]))
+            # buildTmp = np.nansum(np.nansum(buildW[idx]))
+            bufferTmp['buildingsW'] = round(buildTmp,0)
+            
+        if buildS is not None:
+            build = buildS.rio.clip(geoms.geometry)
+            idx = build.data[0] > 0
+            buildTmp = np.nansum(np.nansum(build.where(idx).data[0]))
+            # buildTmp = np.nansum(np.nansum(buildS[idx]))
+            bufferTmp['buildingsS'] = round(buildTmp,0)
+
+        # Roads length (in km)
+        if roadL is not None:
+            clipped_roads = gpd.clip(roadL, geoms)
+            clipped_roads['Length_m'] = clipped_roads.geometry.length
+            roadsTmp = clipped_roads.groupby('highway').sum()[['Length_m']]
+            roadsTot.loc[roadsTmp.index, iB] = roadsTmp.loc[roadsTmp.index, 'Length_m']
+    
+            # for iRoads in indexRd:
+            #     bufferTmp[iRoads] = round(clipped_roads.loc[clipped_roads['highway']==iRoads, 'Length_m'].sum(),0)*1e-3
+            
+        
         bufferTot[iB] = bufferTmp
 
-    return bufferTot
+    return bufferTot, roadsTot
 
 def getRNDS(hazardPath, dictMap, road, epsg, intensity, minArea=3, numPolyThresh=5):
     """
@@ -237,7 +279,7 @@ def getRNDS(hazardPath, dictMap, road, epsg, intensity, minArea=3, numPolyThresh
             intensity (bool): Defines if hazard file contains probabilities (False) or hazard intensity metrics (True)
             minArea (int): Minimum number of pixels required keep a polygon (i.e. polygons with less pixels are discarded)
             numPolyThresh (int): Number of polygons above which some more filtering will be done
-            
+
         Returns:
             tuple: A tuple containing: 
 

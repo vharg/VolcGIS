@@ -28,7 +28,11 @@ epsg = volcgis.getEPSG(lat, lon)
 res = 250
 
 # %% [markdown]
-# We now define an eruption/volcano object and plot the study area.
+# We now define an eruption/volcano object and plot the study area. This will create a folder in `volcanoes/Merapi/` that contains the following folders:
+# - `_data`: Will contain the processed datasets (i.e. re-projected, clipped and aligned)
+# - `_exposure`: Will contain the exposure data
+# - `_hazard`: Will contain the processed hazard datasets (i.e. geotifs, re-projected, clipped and aligned)
+# - `_tmp`: Temporary files
 
 # %%
 # Setup eruption dictionary. The extent defines the coverage of the study area. It can be specified either in *absolute* UTM coordinates or as a *relative* distance from the vent. The behaviour is controlled below.

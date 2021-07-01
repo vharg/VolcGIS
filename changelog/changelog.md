@@ -3,7 +3,8 @@
 ## 2021-06-22
 
 - Replaced `gpd.clip()` by `gpd.sjoin`
-- 
+- Added exposure to roads in `getHazardExposure`
+
 ## 2021-06-21
 
 - Added the example for `PDC` in `MASTER_example.py` and fixed bugs

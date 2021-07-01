@@ -2,32 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://vharg.github.io/VolcGIS/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://vharg.github.io/VolcGIS/MASTER_example/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://vharg.github.io/VolcGIS/changelog/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://vharg.github.io/VolcGIS/tips/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://vharg.github.io/VolcGIS/volcGIS_eruption/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://vharg.github.io/VolcGIS/volcGIS_exposureAnalysis/</loc>
-         <lastmod>2021-06-22</lastmod>
+         <lastmod>2021-07-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

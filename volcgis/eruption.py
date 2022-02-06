@@ -52,11 +52,12 @@ class eruption:
 
         # Set path and folders
         if not os.path.exists(os.path.join(self.path['outPath'], self.name)):
-            os.mkdir(os.path.join(self.path['outPath'], self.name))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_data'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_tmp'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_hazard'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_exposure'))
+            # Changed from os.mkdir to os.makedirs to also create intermediate directories if they don't exist (by JR, 6 Feb 2022)
+            os.makedirs(os.path.join(self.path['outPath'], self.name))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_data'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_tmp'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_hazard'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_exposure'))
         
         # Define projections
         self.EPSG = eruption['epsg']
@@ -260,6 +261,10 @@ class eruption:
         # Loop through hazard files
         for i in range(0,self.hazards[hazard]['data'].shape[0]):
             fl = self.checkHazPath(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth']))
+            # Check if fl exists. If it doesn't, continue to next iteration (by JR, 6 Feb 2022)
+            if not os.path.exists(fl):
+                print(f' - Skipped {fl}. Please verify if file exists.')
+                continue
             printy(f" - Analysing {fl}...")
             haz_data = xio.open_rasterio(fl)
             
@@ -501,6 +506,11 @@ class eruption:
         for inPath in hazFl:
             outPath = inPath.replace(hazard['rootDir'], '')
             print(f'   - {outPath}...')
+            # Check if inPath exists. If it does not exist, continue to process next file (by JR, 6 Feb 2022)
+            if not os.path.exists(inPath):
+                print(f'    - Skipped. {inPath} does not exist. Please verify.')
+                continue
+            
             # Standardise processed outputs as GeoTIFFs if inputs were either in '.asc' or '.txt' formats (by JR, 28 Jan 2022)
             if '.asc' in outPath:
                 outPath = outPath.replace('.asc', '.tif')

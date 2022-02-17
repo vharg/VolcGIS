@@ -23,6 +23,7 @@ import os
 from pyrosm import OSM
 from printy import printy
 import pickle
+import platform # added by JR on 28 Feb 2022
 
 #%%
 class eruption:
@@ -51,11 +52,12 @@ class eruption:
 
         # Set path and folders
         if not os.path.exists(os.path.join(self.path['outPath'], self.name)):
-            os.mkdir(os.path.join(self.path['outPath'], self.name))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_data'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_tmp'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_hazard'))
-            os.mkdir(os.path.join(self.path['outPath'], self.name, '_exposure'))
+            # Changed from os.mkdir to os.makedirs to also create intermediate directories if they don't exist (by JR, 6 Feb 2022)
+            os.makedirs(os.path.join(self.path['outPath'], self.name))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_data'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_tmp'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_hazard'))
+            os.makedirs(os.path.join(self.path['outPath'], self.name, '_exposure'))
         
         # Define projections
         self.EPSG = eruption['epsg']
@@ -189,7 +191,11 @@ class eruption:
                     fl.write(f'END\n')
         
                 # Clip with OSMOSIS
-                osmosis = f"osmosis --read-pbf file={os.path.abspath(self.path['OSMroadsPath'])} --bounding-polygon file={os.path.abspath(inPoly)} --write-pbf file={os.path.abspath(outPathTmp)}"
+                # Check host OS as Windows requires "" for filepaths in Osmosis command (by JR, 28 Jan 2022)
+                if platform.system() == 'Windows':
+                    osmosis = f"osmosis --read-pbf file=\"{os.path.abspath(self.path['OSMroadsPath'])}\" --bounding-polygon file=\"{os.path.abspath(inPoly)}\" --write-pbf file=\"{os.path.abspath(outPathTmp)}\""
+                else: # Linux and Mac should have no issues
+                    osmosis = f"osmosis --read-pbf file={os.path.abspath(self.path['OSMroadsPath'])} --bounding-polygon file={os.path.abspath(inPoly)} --write-pbf file={os.path.abspath(outPathTmp)}"
                 printy('\t...clipping OSM data, which can take a few minutes...')
                 os.system(osmosis)
                 printy('\t...clipping done!')
@@ -255,6 +261,10 @@ class eruption:
         # Loop through hazard files
         for i in range(0,self.hazards[hazard]['data'].shape[0]):
             fl = self.checkHazPath(os.path.join(hazPath, self.hazards[hazard]['data'].iloc[i]['filePth']))
+            # Check if fl exists. If it doesn't, continue to next iteration (by JR, 6 Feb 2022)
+            if not os.path.exists(fl):
+                print(f' - Skipped {fl}. Please verify if file exists.')
+                continue
             printy(f" - Analysing {fl}...")
             haz_data = xio.open_rasterio(fl)
             
@@ -496,7 +506,16 @@ class eruption:
         for inPath in hazFl:
             outPath = inPath.replace(hazard['rootDir'], '')
             print(f'   - {outPath}...')
-            outPath = outPath.replace('.asc', '.tif')
+            # Check if inPath exists. If it does not exist, continue to process next file (by JR, 6 Feb 2022)
+            if not os.path.exists(inPath):
+                print(f'    - Skipped. {inPath} does not exist. Please verify.')
+                continue
+            
+            # Standardise processed outputs as GeoTIFFs if inputs were either in '.asc' or '.txt' formats (by JR, 28 Jan 2022)
+            if '.asc' in outPath:
+                outPath = outPath.replace('.asc', '.tif')
+            elif '.txt' in outPath:
+                outPath = outPath.replace('.txt', '.tif')
             outPath = '{}/{}/_hazard/{}/{}'.format(self.path['outPath'], self.name, hazard['hazard'], outPath)
             
             if not noAlign:
@@ -533,13 +552,23 @@ class eruption:
         if resampling == 'nearest':
             vrt_options['resampling'] = Resampling.nearest
 
-        with rio.open(inPath, 'r') as src:
-            # In case no EPSG is specified (e.g. asc)
-            if src.crs == None:
-                 src.crs = rio.crs.CRS.from_epsg(epsg)
-            with WarpedVRT(src, **vrt_options) as vrt:
-                rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], self.ref['transform']))
-                rio_shutil.copy(vrt, outPath, driver='GTiff', compress='lzw')
+        # Error may sometimes be returned if 'r' is used. When that happens, 'r+' can fix the error (by JR, 28 Jan 2022)
+        try:
+            with rio.open(inPath, 'r') as src:
+                # In case no EPSG is specified (e.g. asc)
+                if src.crs == None:
+                    src.crs = rio.crs.CRS.from_epsg(epsg)
+                with WarpedVRT(src, **vrt_options) as vrt:
+                    rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], self.ref['transform']))
+                    rio_shutil.copy(vrt, outPath, driver='GTiff', compress='lzw')
+        except:
+            with rio.open(inPath, 'r+') as src:
+                # In case no EPSG is specified (e.g. asc)
+                if src.crs == None:
+                    src.crs = rio.crs.CRS.from_epsg(epsg)
+                with WarpedVRT(src, **vrt_options) as vrt:
+                    rst = vrt.read(1, window=from_bounds(self.ref['bounds'][0], self.ref['bounds'][1], self.ref['bounds'][2], self.ref['bounds'][3], self.ref['transform']))
+                    rio_shutil.copy(vrt, outPath, driver='GTiff', compress='lzw')
 
         # if scalingFactor is not None:
             # with rio.open(outPath, 'w', **profile) as src:
@@ -695,7 +724,11 @@ class eruption:
         
         splt = hazPath.split('.')
         if splt[-1:] != 'tif':
-            return ''.join(splt[:-1])+'.tif'
+            # Check if splt has more than 2 elements, which will mean that the original hazard filename contains '.' (by JR, 28 Jan 2022)
+            if len(splt) > 2:
+                return '.'.join(splt[:-1])+'.tif'
+            else:
+                return ''.join(splt[:-1])+'.tif'
         else:
             return hazPath
 

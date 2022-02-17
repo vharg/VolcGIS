@@ -1,0 +1,7 @@
+Country,Building cluster,Mean (tephra loading in kg/m2),Standard deviation,Total replacement cost (USD)
+Indonesia,Weak,331.4025,0.516,15400
+Indonesia,Strong,767.8341,0.529,37800
+Philippines,Weak,367.092,0.482,9500
+Philippines,Strong,900.3951,0.498,20300
+Aggregated,Weak,346.698,0.501,12800
+Aggregated,Strong,795.366,0.522,34100

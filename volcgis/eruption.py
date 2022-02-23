@@ -317,6 +317,9 @@ class eruption:
                     if len(geometry)>1:
                         print('Warning: contouring the raster resuted in more than one polygon')
                     clipped_roads['length'] = clipped_roads.geometry.length
+                    # Checks for duplicated id in clipped_roads. This prevents repeated additions of the length of an affected road (by JR, 13 Feb 2022)
+                    if clipped_roads['id'].duplicated().any(): 
+                        clipped_roads = clipped_roads.drop_duplicates(subset = "id")
                     for iRoads in indexRd:
                         exposureTmp[iRoads] = round(clipped_roads.loc[clipped_roads['class']==iRoads, 'length'].sum(),0)*1e-3
 

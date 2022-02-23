@@ -84,6 +84,7 @@ nameConstructorTephra = {
     'prob':       ['P50', 'P90'],
     'format':     ['.tif']
 }
+
 # PDC hazard
 nameConstructorPDC = {
     'volcano':    ['Merapi'],
@@ -220,7 +221,7 @@ TephraProps= {
 PDCProps= {
     'columns':  ['VEI'],
     'varName':  'prob',
-    'varVal':   [.25, .5, .25]
+    'varVal':   [.25, .5, .75]
 }
 
 # %% [markdown]

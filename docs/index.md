@@ -13,6 +13,8 @@ Welcome to the documentation page for **VolcGIS**!
 
 ## Install
 
+**VolcGIS** was written in Python 3.9 and was tested using `Rasterio 1.1.8`, `rioxarray 0.4`, `GDAL 3.1.4` and `Numpy 1.19.4` for raster analyses and `GeoPandas 0.8.1` and `Shapely 1.7.1` for vector analyses.
+
 ### Setup conda environment
 
 Create environment and set the channel to `conda-forge`:
